@@ -24,6 +24,8 @@
   Si conta ogni tocco dentro il telefono, anche «indietro».
   I comandi del pannello non contano.
   Tasti: 1, 2, 3 cambiano modello; R ricomincia.
+  In alto a destra: «Mappa dell'app» apre la mappa in una finestra al centro;
+  «Ricomincia il task» riporta il task all'inizio.
   Un solo file, nessuna risorsa esterna: funziona offline.
   =====================================================================
 -->
@@ -161,16 +163,35 @@ button{font:inherit;color:inherit;cursor:pointer}
 
 .map{font-size:15px;columns:2;column-gap:28px}
 @media (max-width:520px){.map{columns:1}}
-.map div{break-inside:avoid;margin-bottom:10px}
+.map div{break-inside:avoid;margin-bottom:16px}
 .map b{display:block}
 .map span{display:block;padding-left:16px;color:var(--muted)}
 .map .here{color:var(--water);font-weight:700}
-.reset{border:0;background:transparent;color:var(--water);font-weight:700;padding:6px 0;text-decoration:underline;text-underline-offset:3px}
+.topbar{max-width:1240px;margin:0 auto;padding:20px 24px 0;display:flex;justify-content:flex-end;gap:10px}
+@media (max-width:860px){.topbar{padding:12px 16px 0}}
+.top-btn{border:1px solid var(--line);background:#fff;border-radius:999px;padding:10px 18px;font-weight:700}
+@media (max-width:420px){.top-btn{padding:9px 13px;font-size:15px;white-space:nowrap}}
+.top-btn:hover{border-color:var(--ink)}
+.top-btn.primary-top{background:var(--water);border-color:var(--water);color:#fff}
+.top-btn.primary-top:hover{background:#17588f}
+.modal{border:0;border-radius:22px;padding:28px 32px 32px;width:min(640px,calc(100% - 32px));color:var(--ink);box-shadow:0 30px 80px -20px rgba(22,32,42,.45)}
+.modal::backdrop{background:rgba(22,32,42,.45)}
+.modal[open]{animation:pop .18s ease-out}
+@keyframes pop{from{transform:scale(.97);opacity:0}to{transform:none;opacity:1}}
+.modal-head{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:6px}
+.modal-head h2{margin:0;font-size:26px;letter-spacing:-.01em}
+.modal-close{width:44px;height:44px;border:0;border-radius:12px;background:var(--page);font-size:28px;line-height:1}
+.modal-lead{margin:0 0 20px;color:var(--muted)}
+.modal .map{font-size:18px}
 .hint{font-size:14px;color:var(--muted);margin:8px 0 0}
 @media (prefers-reduced-motion:reduce){*{animation:none!important}}
 </style>
 </head>
 <body>
+<header class="topbar">
+  <button class="top-btn" id="openMap" aria-haspopup="dialog">Mappa dell'app</button>
+  <button class="top-btn primary-top" id="reset">Ricomincia il task</button>
+</header>
 <main class="stage">
   <div class="phone" aria-label="Telefono con l'app Vaso">
     <div class="screen" id="screen"></div>
@@ -210,14 +231,17 @@ button{font:inherit;color:inherit;cursor:pointer}
       <p class="hint" id="stateHint"></p>
     </section>
 
-    <section>
-      <h2>La mappa dell'app</h2>
-      <div class="map" id="map"></div>
-    </section>
-
-    <button class="reset" id="reset">Ricomincia il task</button>
   </div>
 </main>
+
+<dialog class="modal" id="mapDialog" aria-labelledby="mapTitle">
+  <div class="modal-head">
+    <h2 id="mapTitle">La mappa dell'app</h2>
+    <button class="modal-close" id="closeMap" aria-label="Chiudi la mappa">×</button>
+  </div>
+  <p class="modal-lead">Due livelli: le voci della navigazione e, dentro, le schermate. In blu dove siete adesso.</p>
+  <div class="map" id="map"></div>
+</dialog>
 
 <script>
 /* ---------- icone ---------- */
@@ -247,7 +271,7 @@ const MODELS={barra:'Barra in basso',menu:'Menu laterale',tessere:'Tessere'};
 const TASKS={
   annaffia:{label:'Segnare l\'annaffiatura del basilico',small:'Il task di ogni giorno: deve costare poco.',goal:{barra:2,menu:2,tessere:3},from:'home'},
   promemoria:{label:'Da «Le mie piante» a «Promemoria»',small:'Cambiare parte dell\'app.',goal:{barra:1,menu:2,tessere:2},from:'piante'},
-  elimina:{label:'Cancellare il basilico',small:'Qui la fatica è voluta: si chiede conferma.',goal:{barra:3,menu:3,tessere:4},from:'home'},
+  elimina:{label:'Cancellare il basilico',small:'Qui l\'effort è voluto: si chiede conferma.',goal:{barra:3,menu:3,tessere:4},from:'home'},
   libero:{label:'Esplorare liberamente',small:'Nessun traguardo, si contano solo i tocchi.',goal:null,from:'home'}
 };
 const STATES={normale:'Tutto normale',vuoto:'Nessuna pianta',errore:'Foto che non si carica'};
@@ -407,8 +431,12 @@ document.querySelector('.panel').addEventListener('click',e=>{
   if(b.dataset.task){S.task=b.dataset.task;startTask()}
   else if(b.dataset.model){S.model=b.dataset.model;startTask()}
   else if(b.dataset.state){S.data=b.dataset.state;if(S.data!=='normale')S.task='libero';startTask()}
-  else if(b.id==='reset')startTask();
 });
+document.getElementById('reset').addEventListener('click',startTask);
+const mapDialog=document.getElementById('mapDialog');
+document.getElementById('openMap').addEventListener('click',()=>{renderPanel();mapDialog.showModal()});
+document.getElementById('closeMap').addEventListener('click',()=>mapDialog.close());
+mapDialog.addEventListener('click',e=>{if(e.target!==mapDialog)return;const r=mapDialog.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)mapDialog.close()});
 document.addEventListener('keydown',e=>{
   if(e.target.tagName==='INPUT')return;
   const m={'1':'barra','2':'menu','3':'tessere'}[e.key];
