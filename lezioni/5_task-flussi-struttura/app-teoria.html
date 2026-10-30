@@ -172,6 +172,8 @@ button{font:inherit;color:inherit;cursor:pointer}
 .map div{break-inside:avoid;margin-bottom:16px}
 .map b{display:block}
 .map span{display:block;padding-left:16px;color:var(--muted)}
+.map span.l3{padding-left:36px}
+.map span.l3::before{content:'↳ ';color:var(--line)}
 .map .here{color:var(--water);font-weight:700}
 .topbar{max-width:1240px;margin:0 auto;padding:20px 24px 0;display:flex;justify-content:flex-end;gap:10px}
 @media (max-width:860px){.topbar{padding:12px 16px 0}}
@@ -246,7 +248,7 @@ button{font:inherit;color:inherit;cursor:pointer}
     <h2 id="mapTitle">La mappa dell'app</h2>
     <button class="modal-close" id="closeMap" aria-label="Chiudi la mappa">×</button>
   </div>
-  <p class="modal-lead">Due livelli: le voci della navigazione e, dentro, le schermate. In blu dove siete adesso.</p>
+  <p class="modal-lead">Fino a tre livelli: le voci della navigazione, dentro le schermate e, se serve, le schermate che si aprono da una di loro (il Diario si apre dalla Scheda della pianta). In blu dove siete adesso.</p>
   <div class="map" id="map"></div>
 </dialog>
 
@@ -421,7 +423,7 @@ function renderPanel(){
   const here=cur();const root=S.stack.find(v=>v.id!=='hub');
   const sub={piante:['Scheda della pianta','Diario','Aggiungi una pianta'],promemoria:['Elenco dei promemoria'],impara:['Guida alle specie','Chiedi a un esperto'],profilo:['Dati e notifiche']};
   const subHere={pianta:'Scheda della pianta',diario:'Diario',aggiungi:'Aggiungi una pianta'};
-  document.getElementById('map').innerHTML=(S.model==='tessere'?`<div><b class="${here.id==='hub'?'here':''}">Home a tessere</b></div>`:'')+GROUPS.map(g=>`<div><b class="${root&&root.id===g.id&&S.stack.length<=(S.model==='tessere'?2:1)?'here':''}">${g.label}</b>${sub[g.id].map(s=>`<span class="${root&&root.id===g.id&&subHere[here.id]===s?'here':''}">${s}</span>`).join('')}</div>`).join('');
+  document.getElementById('map').innerHTML=(S.model==='tessere'?`<div><b class="${here.id==='hub'?'here':''}">Home a tessere</b></div>`:'')+GROUPS.map(g=>`<div><b class="${root&&root.id===g.id&&S.stack.length<=(S.model==='tessere'?2:1)?'here':''}">${g.label}</b>${sub[g.id].map(s=>`<span class="${s==='Diario'?'l3 ':''}${root&&root.id===g.id&&subHere[here.id]===s?'here':''}">${s}</span>`).join('')}</div>`).join('');
 }
 
 /* ---------- eventi ---------- */
