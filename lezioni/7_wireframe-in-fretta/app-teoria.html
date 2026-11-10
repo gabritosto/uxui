@@ -37,7 +37,10 @@
     ombre e angoli arrotondati delle card (D) · diario con le foto (S) ·
     «Elimina pianta» (S) · barra in basso (S)
 
-  Tasti: 1-6 cambiano vista, S cambia schermata, T testo lungo,
+  Vista 7, «Generato dall'AI» (Lezione 7): un wireframe come quello
+  generato a Lezione 6, con elementi inventati (tasto M li segna) e
+  con ciò che manca al task.
+  Tasti: 1-7 cambiano vista, S cambia schermata, T testo lungo, M segni,
   R ricomincia (il basilico torna da annaffiare).
   Un solo file, nessuna risorsa esterna: funziona offline.
   =====================================================================
@@ -160,6 +163,19 @@ button{font:inherit;color:inherit;cursor:pointer}
 
 /* ===== 2. WIREFRAME (anche Stato vuoto, Errore, Testo lungo) ===== */
 .st-wire{background:#fff;color:#222;font-family:var(--plain)}
+.gen-search{border:2px solid #BDBDBD;padding:10px 12px;color:#777;margin:12px 0 12px;font-size:15px}
+.gen-banner{border:2px solid #9A9A9A;background:#EDEDED;padding:12px;margin:0 0 12px}
+.gen-banner b{display:block;font-size:16px}.gen-banner span{font-size:14px;color:#555}
+.gen-chip{display:inline-block;border:2px solid #BDBDBD;padding:4px 10px;font-size:14px;color:#555;margin:0 0 12px}
+.gen-h{font-size:15px;font-weight:700;margin:10px 0 8px;color:#333}
+.gen-car{display:flex;gap:10px;overflow:hidden;margin-bottom:12px}.gen-car div{flex:none;width:96px;height:96px}
+.gen-sec{border:2px solid #D6D6D6;padding:10px;margin:0 0 12px}.gen-sec b{display:block}.gen-sec span{font-size:14px;color:#555}
+.gen-ghost{border:2px solid #BDBDBD;background:#fff;color:#333;width:100%;padding:12px;font-weight:700;margin:0 0 10px}
+.marks .inv{outline:3px dashed #C2410C;outline-offset:2px;position:relative}
+.marks .inv::after{content:'inventato';position:absolute;right:4px;top:-11px;background:#C2410C;color:#fff;font:700 11px/1.6 system-ui;padding:0 6px}
+.marks .miss{display:block;border:3px dashed #1D6AAE;color:#1D6AAE;font:700 13px/1.4 system-ui;padding:6px 8px;margin:0 0 12px}
+.miss{display:none}
+.markbtn{margin-top:10px;border:1px solid #1D6AAE;background:#fff;color:#1D6AAE;border-radius:999px;padding:7px 14px;font-weight:700}
 .st-wire .status{color:#555}
 .st-wire .tabbar{border-top:2px solid #BDBDBD;background:#fff}
 .st-wire .tab{color:#666}.st-wire .tab[aria-current]{color:#111;font-weight:700}
@@ -305,7 +321,7 @@ button{font:inherit;color:inherit;cursor:pointer}
     </section>
 
     <button class="reset" id="reset">Ricomincia (il basilico torna da annaffiare)</button>
-    <p class="hint">Tasti: da 1 a 6 cambiano vista, S cambia schermata, T accende il testo lungo, R ricomincia.</p>
+    <p class="hint">Tasti: da 1 a 7 cambiano vista, S cambia schermata, T accende il testo lungo, M mostra cosa ha inventato l'AI, R ricomincia.</p>
   </div>
 </main>
 
@@ -360,6 +376,7 @@ const VIEWS={
   wireframe:{n:2,label:'Wireframe',les:7},
   travestito:{n:3,label:'Mockup travestito',les:7},
   gerarchia:{n:4,label:'Gerarchia',les:7},
+  generato:{n:7,label:'Generato dall\'AI',les:7},
   vuoto:{n:5,label:'Stato vuoto',les:8},
   errore:{n:6,label:'Errore',les:8}
 };
@@ -399,6 +416,14 @@ const NOTES={
     look:['Tre gruppi numerati: 1 nome e ultima annaffiatura · 2 «Segna annaffiatura» · 3 diario.','«Elimina pianta» non ha numero: è un\'azione rara, piccola e in basso.','La foto è tolta: l\'ordine si legge lo stesso.'],
     say:'Lo scheletro della scheda regge anche in grigio: prima cosa e quando, poi l\'azione, poi la storia. Se togliendo tutto non si capisse più cosa conta, il colore non lo salverebbe.',
     ask:'Scambiereste il 2 con il 3? Cosa succede a chi apre la scheda solo per annaffiare?'},
+  'piante.generato':{tag:'Lezione 7 · Le mie piante · vista 7',title:'Generato dall\'AI: la struttura c\'è, ma non è stata decisa',
+    look:['È un wireframe low fidelity, come quello che avete generato a Lezione 6: grigio, ordinato, credibile.','Ci sono cose che nessuno ha chiesto: ricerca, banner Premium, meteo, «Piante consigliate», la voce «Shop» nella barra.','Manca la cosa più importante: quale pianta ha sete oggi.'],
+    say:'L\'AI non sa chi è Marta né perché apre Vaso: riempie la schermata con quello che si vede di solito nelle app. Il nostro lavoro è giudicare elemento per elemento: struttura, decorazione o inventato. Poi si decide in Figma e si torna al prototipo con un prompt che dice cosa cambiare e perché.',
+    ask:'Cosa togliete per primo? E cosa manca per annaffiare il basilico?'},
+  'basilico.generato':{tag:'Lezione 7 · Basilico · vista 7',title:'Generato dall\'AI: la scheda con le aggiunte',
+    look:['Restano le cose giuste: foto, nome, ultima annaffiatura, «Segna annaffiatura», «Elimina pianta».','Inventati: «Condividi la pianta», «Consigli di cura dall\'AI», «Acquista fertilizzante», la voce «Shop».','Manca il diario con le foto, che era nella mappa.'],
+    say:'Ogni elemento inventato ha un costo: distrae dall\'azione principale e promette funzioni che il progetto non ha. Ma si toglie con una regola, non con il gusto: «non è nella mappa», «non serve al task».',
+    ask:'Scrivete il prompt che toglie «Acquista fertilizzante»: cosa cambiare e perché.'},
   vuoto:{tag:'Lezione 8 · stato',title:'Stato vuoto: la schermata senza dati',
     look:['La schermata non resta bianca: c\'è un messaggio e un pulsante.','Tre pezzi: cosa succede, perché conviene agire, l\'azione per farlo.','È disegnato in wireframe: anche gli stati si fanno in grigio.','Provate anche «Diario vuoto»: un vuoto dentro una schermata piena.'],
     say:'Lo stato vuoto è la prima cosa che vede chi installa l\'app. Se è bianco, l\'app sembra rotta. Nel wireframe si disegna come una schermata a sé: un messaggio chiaro e un\'azione che porta fuori dal vuoto.',
@@ -414,7 +439,7 @@ const NOTES={
 };
 
 /* ---------- stato ---------- */
-const S={screen:'piante',view:'mockup',empty:'piante',long:false,watered:false,error:true,toast:null};
+const S={screen:'piante',view:'mockup',empty:'piante',long:false,watered:false,error:true,toast:null,marks:false};
 let toastTimer;
 function reset(){S.watered=false;S.error=true;S.toast=null;clearTimeout(toastTimer);render()}
 
@@ -463,6 +488,38 @@ function piante(style){
   </div>`+tabbar(style);
 }
 
+/* ---------- Generato dall'AI: un wireframe low fidelity come lo darebbe un generatore ----------
+   Contiene apposta elementi che nessuno ha deciso (classe inv) e non mostra
+   qualcosa che serve al task (classe miss). Tasto M: mostra o nasconde i segni. */
+function tabbarGen(){
+  const tabs=['Piante','Promemoria','Impara','Shop','Profilo'];
+  return `<nav class="tabbar" style="grid-template-columns:repeat(5,1fr)" aria-label="Barra in basso">${tabs.map((l,i)=>`<button class="tab ${l==='Shop'?'inv':''}" ${i===0?'aria-current="page"':''} data-a="nav"><span class="sq" aria-hidden="true"></span><span>${l}</span></button>`).join('')}</nav>`;
+}
+function generato(screen){
+  if(screen==='piante')return status()+`<div class="top"><h1>Le mie piante</h1></div><div class="body">
+    <div class="gen-search inv">Cerca tra le tue piante</div>
+    <div class="gen-banner inv"><b>Passa a Vaso Premium</b><span>Promemoria illimitati e consigli esclusivi</span></div>
+    <span class="gen-chip inv">Oggi 22° · soleggiato</span>
+    <span class="miss">Manca: quale pianta ha sete oggi (è il task principale)</span>
+    <div class="gen-h">Le tue piante</div>
+    ${PLANTS.map(([n])=>`<button class="prow" data-a="nav"><span class="thumb">${xbox()}</span><span><b>${n}</b><small>Ultima annaffiatura 3 giorni fa</small></span></button>`).join('')}
+    <div class="gen-h inv">Piante consigliate per te</div>
+    <div class="gen-car inv">${[0,1,2].map(()=>`<div>${xbox()}</div>`).join('')}</div>
+    <button class="primary add" data-a="nav">Aggiungi una pianta</button>
+  </div>`+tabbarGen();
+  return status()+topBack()+`<div class="body">
+    <div class="hero-img">${xbox('foto')}</div>
+    <h2 class="name">Basilico</h2>
+    <button class="gen-ghost inv" data-a="nav">Condividi la pianta</button>
+    <div class="gen-sec"><b>Ultima annaffiatura</b><span>lunedì 12 ottobre</span></div>
+    <button class="primary" data-a="water">Segna annaffiatura</button>
+    <div class="gen-sec inv"><b>Consigli di cura dall'AI</b><span>Il basilico ama la luce: spostalo vicino alla finestra.</span></div>
+    <button class="gen-ghost inv" data-a="nav">Acquista fertilizzante</button>
+    <span class="miss">Manca: il diario con le foto</span>
+    <button class="del" data-a="nav">Elimina pianta</button>
+  </div>`+tabbarGen();
+}
+
 /* ---------- Gerarchia: tolti colore, immagini e icone decorative ---------- */
 function gerarchia(screen){
   if(screen==='piante')return status()+`<div class="top"><h1>Le mie piante</h1></div><div class="body">
@@ -492,6 +549,7 @@ function vuotoPiante(){
 function screenHTML(style,o){
   let h;
   if(style==='hier')h=gerarchia(o.screen);
+  else if(style==='gen')h=generato(o.screen);
   else if(o.emptyPage)h=vuotoPiante();
   else if(o.screen==='piante')h=piante(style);
   else h=basilico(style,o);
@@ -499,7 +557,7 @@ function screenHTML(style,o){
   return h;
 }
 function phone(style,o,cap,cls=''){
-  return `<div class="device ${cls?'pair':''}">${cap||''}<div class="phone ${cls}"><div class="screen st-${style} ${o.fixed?'fixed':''}" data-screen>${screenHTML(style,o)}</div></div></div>`;
+  return `<div class="device ${cls?'pair':''}">${cap||''}<div class="phone ${cls}"><div class="screen st-${style==='gen'?'wire':style} ${o.fixed?'fixed':''}" data-screen>${screenHTML(style,o)}</div></div></div>`;
 }
 
 /* ---------- disegno ---------- */
@@ -512,10 +570,11 @@ function render(){
                +phone('wire',{screen:'basilico',long:true,fixed:true},'<div class="cap">Posizioni fisse <i class="ko">si rompe</i></div>','small');
   }else{
     const v=S.view;
-    const style={mockup:'mock',wireframe:'wire',travestito:'fake',gerarchia:'hier',vuoto:'wire',errore:'wire'}[v];
+    const style={mockup:'mock',wireframe:'wire',travestito:'fake',gerarchia:'hier',generato:'gen',vuoto:'wire',errore:'wire'}[v];
     const screen=VIEWS[v].les===7?S.screen:(v==='vuoto'&&S.empty==='piante'?'piante':'basilico');
     const o={screen,showError:v==='errore'&&S.error,emptyPage:v==='vuoto'&&S.empty==='piante',emptyDiary:v==='vuoto'&&S.empty==='diario'};
     ph.innerHTML=phone(style,o,'');
+    ph.classList.toggle('marks',v==='generato'&&S.marks);
     /* se c'è un errore o un diario vuoto, lo si porta in vista dentro il telefono */
     const box=ph.querySelector('.errbox,.emptybox');
     if(box){const body=box.closest('.body');body.scrollTop=box.offsetTop+box.offsetHeight-body.clientHeight+18}
@@ -537,7 +596,7 @@ function renderPanel(){
   document.getElementById('card').innerHTML=`<span class="tag">${n.tag}</span><h3>${n.title}</h3>
     <h4>Cosa guardare</h4><ul>${n.look.map(x=>`<li>${x}</li>`).join('')}</ul>
     <h4>Cosa dire</h4><p>${n.say}</p>
-    <h4>Domanda per la classe</h4><p class="ask">${n.ask}</p>`;
+    <h4>Domanda per la classe</h4><p class="ask">${n.ask}</p>${!S.long&&S.view==='generato'?`<button class="markbtn" id="marks">${S.marks?'Nascondi i segni (M)':'Mostra cosa ha inventato e cosa manca (M)'}</button>`:''}`;
 }
 
 /* ---------- azioni dentro il telefono ---------- */
@@ -561,8 +620,9 @@ document.querySelector('.panel').addEventListener('click',e=>{
   else if(b.dataset.empty){S.empty=b.dataset.empty;render()}
   else if(b.id==='longSwitch'){S.long=!S.long;reset()}
   else if(b.id==='reset')reset();
+  else if(b.id==='marks'){S.marks=!S.marks;render()}
 });
-function setView(v){S.view=v;S.long=false;reset()}
+function setView(v){S.view=v;S.long=false;S.marks=false;reset()}
 function setScreen(s){S.screen=s;S.long=false;if(VIEWS[S.view].les!==7)S.view='mockup';reset()}
 document.addEventListener('keydown',e=>{
   if(e.ctrlKey||e.metaKey||e.altKey)return;
@@ -571,6 +631,7 @@ document.addEventListener('keydown',e=>{
   else if(e.key==='s'||e.key==='S')setScreen(S.screen==='piante'?'basilico':'piante');
   else if(e.key==='t'||e.key==='T'){S.long=!S.long;reset()}
   else if(e.key==='r'||e.key==='R')reset();
+  else if(e.key==='m'||e.key==='M'){S.marks=!S.marks;render()}
 });
 function ripple(e){
   if(matchMedia('(prefers-reduced-motion: reduce)').matches||!e.clientX)return;
