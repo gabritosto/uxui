@@ -1,0 +1,495 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vaso — Colore e testo (Lezione 9)</title>
+<!--
+  =====================================================================
+  VASO — prototipo per mostrare la teoria della Lezione 9
+  Corso UX/UI Design. Non è un'app confusa: serve a confrontare la
+  stessa schermata scelta «a occhio» e poi misurata con i token.
+  Nato da una copia del prototipo della Lezione 7 (stesso telefono,
+  stesso pannello, stessa app). Quel file non è stato toccato.
+  =====================================================================
+  "Vaso" è un'app inventata per curare le piante di casa.
+  Schermata: «Le mie piante», Marta, il basilico ha sete oggi.
+
+  Viste (nomi esatti, citati nelle note del docente):
+    1. Con errori   V1 di case-study.md:
+                    - nota «Annaffiata 3 giorni fa» #A3A3A3 su bianco, 13 px (2,52:1)
+                    - «Aggiungi una pianta» bianco su #7BC67E, 16 px (2,05:1)
+                    - «ha sete» detto solo da un pallino rosso #E05A4F (3,66:1)
+                    - titolo bianco sopra una foto di foglie
+                    - sei tipi di testo
+    2. Con i token  la stessa schermata con i token di V2
+    3. I token      il foglio di V2: palette e scala tipografica
+
+  Interruttori (valgono sulle viste 1 e 2):
+    C  Mostra i contrasti   rapporto calcolato qui sotto con la formula WCAG
+    T  Conta i tipi di testo
+    B  Bianco e nero        filtro in scala di grigi sul telefono
+    F  Foto chiara          solo la vista 1 ha un testo sopra la foto
+    R  Ricomincia
+  Un solo file, nessuna risorsa esterna: funziona offline.
+  =====================================================================
+-->
+<style>
+:root{
+  /* colori del pannello del docente (come nel prototipo di Lezione 7) */
+  --page:#E8EDEF; --ink:#16202A; --muted:#566370; --line:#C6D0D5;
+  --water:#1D6AAE; --water-soft:#DCEAF6;
+  --leaf:#2D6A45; --leaf-soft:#E3EFE6;
+  --font:"Atkinson Hyperlegible","Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
+  --plain:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  /* i token di Vaso (--colore-...) sono scritti dal JavaScript, dall'elenco TOKENS */
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0}
+body{background:var(--page);color:var(--ink);font-family:var(--font);font-size:17px;line-height:1.45}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--water);outline-offset:2px}
+
+.stage{max-width:1280px;margin:0 auto;padding:28px 24px 40px;display:grid;grid-template-columns:auto 1fr;gap:48px;align-items:start}
+@media (max-width:900px){.stage{grid-template-columns:1fr;gap:28px;padding:16px}}
+
+/* ---------- telefono ---------- */
+.phones{display:flex;gap:20px;align-items:flex-start;position:sticky;top:20px}
+.phones.tall{position:relative;top:0}
+@media (max-width:900px){.phones{position:relative;top:0;justify-content:center;min-width:0}.sheet{width:100%;padding:18px 16px 22px}}
+.device{display:flex;flex-direction:column;align-items:center;gap:10px}
+.phone{width:380px;height:760px;border-radius:44px;background:#1B1F23;padding:12px;box-shadow:0 30px 60px -30px rgba(22,32,42,.55)}
+@media (max-width:900px){.phone{width:min(380px,100%);height:720px}.device{width:100%}}
+.screen{position:relative;width:100%;height:100%;border-radius:34px;overflow:hidden;display:flex;flex-direction:column}
+.screen.bw{filter:grayscale(1)}
+.status{height:34px;flex:none;display:flex;justify-content:space-between;align-items:center;padding:0 26px;font:700 13px/1 var(--plain)}
+.top{flex:none;display:flex;align-items:center;padding:2px 18px 8px;min-height:50px}
+.top h1{margin:0}
+.body{flex:1;overflow:auto;padding:0 18px 18px;position:relative}
+.tabbar{flex:none;display:grid;grid-template-columns:repeat(4,1fr);padding:6px 4px 14px}
+.tab{border:0;background:transparent;display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 0;border-radius:10px}
+.tab .ic{display:grid;place-items:center;width:52px;height:28px;border-radius:999px}
+.tab svg{width:22px;height:22px}
+.prow{width:100%;display:flex;align-items:center;gap:12px;padding:10px 12px;margin-bottom:10px;text-align:left;border:0}
+.prow .thumb{width:52px;height:52px;flex:none;overflow:hidden;border-radius:14px}
+.prow .thumb svg{width:100%;height:100%;display:block}
+.prow .txt{flex:1;min-width:0;display:flex;flex-direction:column;align-items:flex-start}
+.primary{width:100%;border:0;padding:15px;margin:6px 0 0;display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:6px;border-radius:16px}
+.toast{position:absolute;left:14px;right:14px;bottom:92px;border-radius:14px;padding:12px 14px;font:700 15px/1.3 var(--plain);z-index:7;background:#1F2A24;color:#fff;animation:up .2s ease-out}
+@keyframes up{from{transform:translateY(10px);opacity:0}to{transform:none;opacity:1}}
+
+/* ===== 1. CON ERRORI (V1) =====
+   Sei tipi di testo e due font, scelti a occhio. Ogni errore è segnato. */
+.st-v1{background:#F6F8F4;color:#16202A;font-family:var(--plain)}
+.st-v1 .status{color:#16202A}
+/* ERRORE 4 (idea 3): titolo bianco sopra una foto. Il contrasto cambia con la foto. */
+.v1-hero{position:relative;flex:none;height:150px;margin:4px 18px 14px;border-radius:22px;overflow:hidden}
+.v1-hero svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+.v1-hero h1{position:absolute;left:18px;right:12px;bottom:14px;margin:0;color:#FFFFFF;font:700 30px/1.1 Georgia,"Times New Roman",serif}  /* tipo 1 */
+.v1-greet{margin:0 0 12px;font-size:18px;font-weight:500;color:#3C4A40}                                                          /* tipo 2 */
+.v1-label{margin:0 0 8px;font-size:12px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#4F5B53}              /* tipo 3 */
+.st-v1 .prow{background:#FFFFFF;border-radius:16px;box-shadow:0 6px 14px -10px rgba(22,32,42,.45)}
+.v1-name{font-size:17px;font-weight:700;color:#16202A}                                                                             /* tipo 4 */
+/* ERRORE 1 (idea 1): nota grigio chiaro, 13 px: 2,52:1 su bianco, serve 4,5 */
+.v1-note{font-size:13px;font-weight:400;color:#A3A3A3}                                                                             /* tipo 5 */
+/* ERRORE 3 (idea 2): lo stato «ha sete» è detto solo dal colore del pallino.
+   Il verde #389047 ha quasi la stessa luminosità del rosso: in bianco e nero sono uguali. */
+.dot{width:14px;height:14px;border-radius:50%;flex:none}
+.dot.thirsty{background:#E05A4F}
+.dot.fine{background:#389047}
+.nameline{display:flex;align-items:center;flex-wrap:wrap;gap:2px 8px}
+/* ERRORE 2 (idea 1): testo bianco su verde chiaro, 16 px: 2,05:1, serve 4,5 */
+.st-v1 .primary{background:#7BC67E;color:#FFFFFF;font-size:16px;font-weight:700}                                                  /* tipo 6 */
+.st-v1 .tabbar{background:#FFFFFF;border-top:1px solid #DDE4DE}
+.st-v1 .tab .ic{color:#7C8B84}
+.st-v1 .tab[aria-current] .ic{color:#2D6A45;background:#E3EFE6}
+.st-v1 .tab .lbl{font-size:13px;font-weight:400;color:#A3A3A3}                                                                     /* tipo 5, come la nota */
+
+/* ===== 2. CON I TOKEN (V2) =====
+   Solo token: nessun colore e nessuna dimensione «sciolti». Un solo font. */
+.st-v2{background:var(--colore-sfondo);color:var(--colore-testo);font-family:var(--font)}
+.st-v2 .status{color:var(--colore-testo)}
+.testo-titolo{font-size:28px;font-weight:700;line-height:1.15}
+.testo-sottotitolo{font-size:20px;font-weight:600;line-height:1.2}
+.testo-corpo{font-size:16px;font-weight:400;line-height:1.4}
+.testo-nota{font-size:13px;font-weight:400;line-height:1.35}
+.c-testo{color:var(--colore-testo)}
+.c-secondario{color:var(--colore-testo-secondario)}
+.c-acqua{color:var(--colore-acqua)}
+.v2-greet{margin:0 0 14px}
+.st-v2 .prow{background:var(--colore-superficie);border-radius:16px;box-shadow:0 6px 14px -10px rgba(22,32,42,.45)}
+.thirst{display:inline-flex;align-items:center;gap:5px;margin:2px 0 1px;flex-wrap:wrap}
+.thirst svg{width:17px;height:17px;flex:none}
+.st-v2 .primary{background:var(--colore-primario);color:var(--colore-superficie)}
+.st-v2 .tabbar{background:var(--colore-superficie);border-top:1px solid #DDE4DE}
+.st-v2 .tab .ic{color:var(--colore-testo-secondario)}
+.st-v2 .tab[aria-current] .ic{color:var(--colore-primario);background:#E3EFE6}
+
+/* ---------- interruttore C: etichette dei contrasti ---------- */
+.cb{display:inline-block;vertical-align:middle;margin:2px 0 0 6px;padding:1px 7px;border-radius:6px;font:700 11px/1.5 var(--plain);letter-spacing:0;text-transform:none;font-style:normal;color:#FFFFFF;white-space:nowrap;text-align:left;box-shadow:0 0 0 2px #FFFFFF}
+.cb.ok{background:#1E6B3A}
+.cb.ko{background:#B3261E}
+h1 .cb{font-size:11px}
+
+/* ---------- interruttore T: numero del tipo di testo ---------- */
+.count [data-t]::before{content:attr(data-t);display:inline-block;vertical-align:2px;margin-right:6px;white-space:nowrap;background:#5B21B6;color:#FFFFFF;font:700 11px/16px var(--plain);letter-spacing:0;text-transform:none;font-style:normal;padding:0 6px;border-radius:999px;box-shadow:0 0 0 2px #FFFFFF}
+.count .tab{position:relative}
+.count .tab [data-t]::before{position:absolute;top:0;left:50%;transform:translateX(-50%);margin:0}
+
+/* ---------- vista 3: il foglio dei token ---------- */
+.sheet{width:460px;max-width:100%;background:#FFFFFF;border:1px solid var(--line);border-radius:22px;padding:22px 22px 26px;box-shadow:0 30px 60px -30px rgba(22,32,42,.35)}
+.sheet .kicker{font-size:13px;color:var(--muted);margin:0}
+.sheet h2{font-size:26px;margin:2px 0 4px;letter-spacing:-.01em}
+.sheet h3{font-size:14px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:20px 0 10px}
+.tok{display:grid;grid-template-columns:48px 1fr;gap:12px;padding:10px 0;border-top:1px solid #E5EAEC}
+.tok>div{min-width:0}
+.tok .sw{width:48px;height:48px;border-radius:12px;border:1px solid #C6D0D5}
+.tok code,.sty code{font-family:var(--mono);font-size:14px;font-weight:700;overflow-wrap:anywhere}
+.tok .val{font-family:var(--mono);font-size:13px;color:var(--muted);margin-left:6px}
+.tok .use{font-size:14px;margin:2px 0 4px}
+.tok .cr{display:flex;flex-wrap:wrap;gap:6px}
+.tok .cr .cb{margin:0;box-shadow:none}
+.tok .none{font-size:13px;color:var(--muted)}
+.sty{padding:12px 0;border-top:1px solid #E5EAEC}
+.sty .sample{color:var(--colore-testo);font-family:var(--font);display:block;margin-bottom:4px}
+.sty .meta{font-size:13px;color:var(--muted);margin-left:6px}
+.sheet .foot{font-size:14px;color:var(--muted);margin:14px 0 0}
+
+/* tocco: il cerchio che si vede sul proiettore */
+.ripple{position:fixed;width:46px;height:46px;margin:-23px 0 0 -23px;border-radius:50%;border:3px solid var(--water);pointer-events:none;z-index:50;animation:rip .45s ease-out forwards}
+@keyframes rip{from{transform:scale(.4);opacity:1}to{transform:scale(1.3);opacity:0}}
+
+/* ---------- pannello del docente ---------- */
+.panel{min-width:0}
+.panel h2{font-size:15px;color:var(--muted);margin:0 0 10px;font-weight:700}
+.panel section{margin-bottom:22px}
+.title{font-size:34px;line-height:1.1;margin:0 0 6px;letter-spacing:-.02em}
+.lead{margin:0 0 18px;color:var(--muted);max-width:60ch}
+.seg{display:flex;flex-wrap:wrap;gap:8px}
+.seg button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:9px 16px;font-weight:700}
+.seg button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+kbd{font:inherit;font-size:12px;opacity:.6;margin-right:6px}
+.switches{display:flex;flex-wrap:wrap;gap:8px}
+.switch{display:flex;align-items:center;gap:10px;border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 16px 7px 8px;font-weight:700}
+.switch .knob{width:46px;height:26px;border-radius:999px;background:#B9C4CA;position:relative;flex:none;transition:background .15s}
+.switch .knob::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:left .15s}
+.switch[aria-checked="true"]{border-color:var(--ink)}
+.switch[aria-checked="true"] .knob{background:var(--leaf)}
+.switch[aria-checked="true"] .knob::after{left:23px}
+.switch:disabled{opacity:.45;cursor:default}
+
+.card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px 20px}
+.card .tag{display:inline-block;font-size:13px;font-weight:700;color:var(--water);background:var(--water-soft);border-radius:999px;padding:2px 10px;margin-bottom:6px}
+.card h3{font-size:24px;margin:0 0 12px;letter-spacing:-.01em}
+.card h4{font-size:14px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:14px 0 6px}
+.card ul{margin:0;padding-left:20px}
+.card li{margin-bottom:4px}
+.card p{margin:0}
+.ask{background:var(--leaf-soft);border-radius:12px;padding:10px 14px;font-weight:700;color:#1E4A30}
+.reset{border:0;background:transparent;color:var(--water);font-weight:700;padding:6px 0;text-decoration:underline;text-underline-offset:3px}
+.hint{font-size:14px;color:var(--muted);margin:8px 0 0}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<main class="stage">
+  <div class="phones" id="phones"></div>
+
+  <div class="panel">
+    <h1 class="title">Vaso: la stessa schermata, prima a occhio e poi con i token</h1>
+    <p class="lead">Partite dalla vista 1 e accendete gli interruttori uno alla volta. Poi passate alla vista 2 con gli stessi interruttori accesi, e chiudete con il foglio dei token.</p>
+
+    <section>
+      <h2>Lezione 9 · Colore e testo</h2>
+      <div class="seg" id="views"></div>
+    </section>
+
+    <section>
+      <h2>Interruttori (viste 1 e 2)</h2>
+      <div class="switches" id="switches"></div>
+      <p class="hint" id="swHint" hidden>Gli interruttori valgono sulle viste 1 e 2. Qui i contrasti sono già scritti accanto a ogni colore.</p>
+    </section>
+
+    <section aria-live="polite">
+      <div class="card" id="card"></div>
+    </section>
+
+    <button class="reset" id="reset">Ricomincia (vista 1, interruttori spenti)</button>
+    <p class="hint">Tasti: 1, 2 e 3 cambiano vista; C contrasti, T tipi di testo, B bianco e nero, F foto chiara; R ricomincia.</p>
+  </div>
+</main>
+
+<script>
+/* ---------- i token di Vaso: V2 di case-study.md ----------
+   Unica fonte dei colori della vista 2 e del foglio della vista 3. */
+const TOKENS=[
+  {name:'colore/sfondo',v:'#F6F8F4',use:'Fondo di tutte le schermate',pairs:[]},
+  {name:'colore/superficie',v:'#FFFFFF',use:'Fondo delle card',pairs:[]},
+  {name:'colore/testo',v:'#16202A',use:'Titoli e testi',pairs:[['#F6F8F4','su sfondo'],['#FFFFFF','su superficie']]},
+  {name:'colore/testo-secondario',v:'#566370',use:'Note, date',pairs:[['#F6F8F4','su sfondo'],['#FFFFFF','su superficie']]},
+  {name:'colore/primario',v:'#2D6A45',use:'Fondo dei bottoni, come «Aggiungi una pianta»',pairs:[['#FFFFFF','con il testo bianco',true]]},
+  {name:'colore/acqua',v:'#1D6AAE',use:'«Ha sete oggi», sempre con la goccia',pairs:[['#FFFFFF','su superficie']]},
+  {name:'colore/errore',v:'#B3261E',use:'Messaggi di errore, sempre con il testo',pairs:[['#FFFFFF','su superficie']]}
+];
+const STYLES=[
+  {name:'testo/titolo',cls:'testo-titolo',meta:'28 px · grassetto',sample:'Le mie piante'},
+  {name:'testo/sottotitolo',cls:'testo-sottotitolo',meta:'20 px · semigrassetto',sample:'Basilico'},
+  {name:'testo/corpo',cls:'testo-corpo',meta:'16 px · normale · anche i bottoni',sample:'Ciao Marta, oggi una pianta ha sete.'},
+  {name:'testo/nota',cls:'testo-nota',meta:'13 px · normale',sample:'Annaffiata 3 giorni fa'}
+];
+TOKENS.forEach(t=>document.documentElement.style.setProperty('--'+t.name.replace('/','-'),t.v));
+
+/* ---------- contrasto: formula WCAG 2 (luminanza relativa) ---------- */
+function hexRgb(h){h=h.replace('#','');return [0,2,4].map(i=>parseInt(h.slice(i,i+2),16))}
+function cssRgb(s){const m=s.match(/[\d.]+/g).map(Number);return {rgb:m.slice(0,3),a:m.length>3?m[3]:1}}
+function lum(rgb){
+  const [r,g,b]=rgb.map(c=>{c/=255;return c<=0.03928?c/12.92:Math.pow((c+0.055)/1.055,2.4)});
+  return 0.2126*r+0.7152*g+0.0722*b;
+}
+function ratio(a,b){const l1=lum(a),l2=lum(b);return (Math.max(l1,l2)+0.05)/(Math.min(l1,l2)+0.05)}
+const fmt=n=>n.toFixed(2).replace('.',',');
+const fmtT=t=>String(t).replace('.',',');
+/* soglia: 3 per testo grande (almeno 24 px, o 19 px in grassetto) ed elementi grafici, 4,5 per il resto */
+function threshold(kind,px,weight){if(kind==='graphic')return 3;return (px>=24||(px>=19&&weight>=700))?3:4.5}
+function badge(r,t){const ok=r>=t;return `<span class="cb ${ok?'ok':'ko'}" data-ratio="${fmt(r)}">${fmt(r)}:1 · soglia ${fmtT(t)} · ${ok?'passa':'non passa'}</span>`}
+/* il primo sfondo pieno sotto un elemento, risalendo nella pagina */
+function bgOf(el){
+  while(el){const c=cssRgb(getComputedStyle(el).backgroundColor);if(c.a>0)return c.rgb;el=el.parentElement}
+  return [255,255,255];
+}
+
+/* ---------- icone ---------- */
+const I={
+  leaf:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19c0-8 5-13 14-14 0 9-5 14-13 14"/><path d="M5 19l7-7"/></svg>',
+  bell:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 21h4"/></svg>',
+  book:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 21V5"/></svg>',
+  user:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/></svg>',
+  drop:'<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" aria-hidden="true"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/></svg>'
+};
+
+/* ---------- illustrazioni (SVG disegnati qui, nessuna foto vera) ---------- */
+/* la "foto" di foglie dietro il titolo della vista 1; light = la foto chiara (tasto F) */
+function foto(light){
+  const bg=light?'#EEF4EA':'#24492E';
+  const pal=light?['#F8FBF6','#E3EEDD','#FFFFFF','#DCE9D5']:['#3F7D4B','#2E6339','#4E9A5C','#1D3D25'];
+  let s=7,h='';
+  const rnd=()=>{s=(s*9301+49297)%233280;return s/233280};
+  for(let i=0;i<26;i++){
+    const x=Math.round(rnd()*320),y=Math.round(rnd()*170),r=Math.round(rnd()*180),w=26+Math.round(rnd()*30);
+    h+=`<ellipse cx="${x}" cy="${y}" rx="${w}" ry="${Math.round(w*.42)}" transform="rotate(${r} ${x} ${y})" fill="${pal[i%4]}"/>`;
+  }
+  return `<svg viewBox="0 0 320 150" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Foto di foglie${light?' chiare':''}"><rect width="320" height="150" fill="${bg}"/>${h}</svg>`;
+}
+/* piccola pianta per l'elenco: k = tipo */
+function mini(k){
+  const pal=[['#4C9A5E','#E3EFE6','#C8693F'],['#2F7A54','#DCEDE2','#9C7A5B'],['#5E8C3E','#EAEDE4','#B0603A'],['#3F8A52','#E6EFE3','#A86A45']][k%4];
+  const shape=[`<ellipse cx="17" cy="20" rx="7" ry="4.5" fill="${pal[0]}" transform="rotate(-30 17 20)"/><ellipse cx="27" cy="18" rx="7" ry="4.5" fill="${pal[0]}" transform="rotate(30 27 18)"/><ellipse cx="22" cy="13" rx="5" ry="3.5" fill="${pal[0]}"/>`,
+    `<path d="M22 28C10 26 8 14 16 9c2 6 6 8 6 19zM22 28c12-2 14-14 6-19-2 6-6 8-6 19z" fill="${pal[0]}"/>`,
+    `<circle cx="22" cy="14" r="9" fill="${pal[0]}"/><path d="M22 22v6" stroke="${pal[2]}" stroke-width="2"/>`,
+    `<path d="M22 28V8M22 12l-5-3M22 16l5-3M22 20l-5-3M22 24l5-3" stroke="${pal[0]}" stroke-width="2.4" stroke-linecap="round"/>`][k%4];
+  return `<svg viewBox="0 0 44 44" aria-hidden="true"><rect width="44" height="44" fill="${pal[1]}"/>${shape}<path d="M14 28h16l-2 12H16z" fill="${pal[2]}"/></svg>`;
+}
+
+/* ---------- contenuti ---------- */
+const PLANTS=[['Basilico','Annaffiata 3 giorni fa',true],['Monstera','Annaffiata ieri'],['Ficus','Annaffiata 2 giorni fa'],['Rosmarino','Annaffiata oggi']];
+const VIEWS={1:'Con errori',2:'Con i token',3:'I token'};
+const SWITCHES={c:'Mostra i contrasti',t:'Conta i tipi di testo',b:'Bianco e nero',f:'Foto chiara'};
+
+/* testi del pannello: cosa guardare, cosa dire, domanda */
+const NOTES={
+  v1:{tag:'Lezione 9 · vista 1',title:'Con errori: la schermata scelta a occhio',
+    look:['La nota grigia «Annaffiata 3 giorni fa» sotto il basilico: piccola e chiara.','Il bottone «Aggiungi una pianta»: testo bianco su un verde chiaro.','Il basilico ha sete: lo dice solo il pallino rosso. Le altre piante hanno un pallino verde.','Il titolo bianco sta sopra una foto di foglie.'],
+    say:'È una bella schermata, ma nessuna scelta è stata misurata. Ci sono quattro errori di colore, più uno di testo: troppi tipi di testo. Li troviamo con gli interruttori, uno alla volta.',
+    ask:'La riga «Annaffiata 3 giorni fa» si legge? Ne siete sicuri anche al sole?'},
+  v2:{tag:'Lezione 9 · vista 2',title:'Con i token: la stessa schermata, misurata',
+    look:['La nota è in colore/testo-secondario, il bottone in colore/primario.','Il basilico dice «Ha sete oggi» con una goccia, in colore/acqua: colore e parola.','Il titolo sta fuori dalla foto, su colore/sfondo.','Quattro tipi di testo, un solo font.'],
+    say:'Stessa schermata, stesso ordine. Ogni colore e ogni testo ora viene da un token, cioè da una decisione con un nome. Non è più bella per gusto: è giusta per un numero.',
+    ask:'Se cambio colore/primario, cosa cambia nelle 3 schermate chiave?'},
+  v3:{tag:'Lezione 9 · vista 3',title:'I token: ogni decisione ha un nome',
+    look:['La palette: sette colori, ognuno con il nome del token, il valore, dove si usa e il contrasto.','I nomi dicono il ruolo, non il colore: colore/primario, non verde-scuro.','La scala tipografica: quattro stili di testo, un solo font.','I contrasti sono calcolati qui, con la formula delle linee guida WCAG.'],
+    say:'In Figma i colori diventano variabili e i testi stili di testo. Si cambia un valore in un punto e cambia ovunque. A Lezione 10 i componenti useranno questi stessi nomi, e a Lezione 11 li leggerà un\'AI.',
+    ask:'Se domani cambio il verde del bottone, quante schermate devo ritoccare?'},
+  c1:{tag:'Lezione 9 · vista 1 · C',title:'Mostra i contrasti: due testi sotto la soglia',
+    look:['Nota: 2,52:1, ne serve 4,5. Bottone: 2,05:1, ne serve 4,5.','Pallino rosso: 3,66:1. È un elemento grafico: la soglia è 3, e passa.','Titolo sulla foto: nessun numero, perché cambia con la foto.','Soglie WCAG, livello AA: 4,5 per il testo normale; 3 per il testo grande (almeno 24 px, o 19 px in grassetto) e per gli elementi grafici.'],
+    say:'Il contrasto si misura, non si guarda. Questi numeri sono gli stessi che vi dà il WebAIM Contrast Checker o un plugin di contrasto in Figma.',
+    ask:'Quale errore passa la soglia ed è comunque un errore?'},
+  c2:{tag:'Lezione 9 · vista 2 · C',title:'Mostra i contrasti: tutto sopra la soglia',
+    look:['Nota 6,15:1, bottone 6,44:1, «Ha sete oggi» 5,64:1, titolo 15,42:1.','Ogni coppia di testo e sfondo ha il suo numero. Gli stessi numeri sono nel foglio dei token (vista 3).'],
+    say:'Ogni testo ora si giustifica con un numero sopra la sua soglia. Il metodo: si misura la coppia di testo e sfondo più debole della schermata.',
+    ask:'Qual è la coppia di testo e sfondo più debole di questa schermata? Passa?'},
+  t1:{tag:'Lezione 9 · vista 1 · T',title:'Conta i tipi di testo: sei',
+    look:['1 il titolo, con un altro font · 2 il saluto · 3 «Le tue piante» in maiuscolo · 4 i nomi delle piante · 5 le note · 6 il bottone.','Le voci della barra in basso hanno lo stesso tipo delle note: stesso numero.','Un tipo di testo è dimensione, spessore e colore: se ne cambia uno, è un tipo nuovo.','La barra di stato in alto (ora, batteria) è del telefono, non dell\'app: non si conta.'],
+    say:'Con sei tipi di testo l\'occhio non sa più cosa è importante. La scala tipografica è l\'elenco corto dei tipi permessi: di solito 3 o 4.',
+    ask:'Contate i tipi di testo. Se ne poteste tenere solo quattro, quali unireste?'},
+  t2:{tag:'Lezione 9 · vista 2 · T',title:'Conta i tipi di testo: quattro',
+    look:['1 testo/titolo, 28 px grassetto: «Le mie piante».','2 testo/sottotitolo, 20 px semigrassetto: i nomi delle piante.','3 testo/corpo, 16 px normale: il saluto, «Ha sete oggi» e il bottone.','4 testo/nota, 13 px normale: le date e le voci della barra.'],
+    say:'Quattro stili di testo e un solo font. Il colore arriva da un token di colore: «Ha sete oggi» è testo/corpo con colore/acqua, il bottone è testo/corpo in bianco.',
+    ask:'Quanti tipi di testo ha la vostra schermata chiave? Se sono più di 4, quali unite?'},
+  b1:{tag:'Lezione 9 · vista 1 · B',title:'Bianco e nero: il pallino non dice più niente',
+    look:['Il pallino rosso del basilico e i pallini verdi delle altre piante diventano dello stesso grigio.','Senza colore non si sa più quale pianta ha sete.','Così vede la schermata chi non distingue il rosso dal verde.'],
+    say:'Il pallino passava la soglia, eppure l\'informazione è sparita. Se uno stato è detto solo dal colore, chi non lo distingue lo perde. Si corregge con una parola e una goccia.',
+    ask:'In bianco e nero, sapete ancora quale pianta annaffiare? Da cosa?'},
+  b2:{tag:'Lezione 9 · vista 2 · B',title:'Bianco e nero: la parola resta',
+    look:['«Ha sete oggi» si legge anche senza colore, e la goccia resta una goccia.','Il bottone resta scuro con il testo chiaro: si legge ancora.'],
+    say:'Ogni stato si dice due volte: colore e parola, icona o forma. Il colore aiuta chi lo vede; la parola funziona per tutti.',
+    ask:'Nella vostra schermata c\'è uno stato detto solo dal colore?'},
+  f1:{tag:'Lezione 9 · vista 1 · F',title:'Foto chiara: il titolo sparisce',
+    look:['Stessa schermata, un\'altra foto: più chiara.','Il titolo bianco quasi non si vede più.','Per questo un testo sopra una foto non si può verificare una volta per tutte.'],
+    say:'Si corregge in due modi: si sposta il titolo fuori dalla foto, oppure si mette dietro una velatura, una fascia scura e semitrasparente, e si misura sul punto più chiaro.',
+    ask:'E se domani la foto è chiara?'},
+  f2:{tag:'Lezione 9 · vista 2 · F',title:'Foto chiara: qui non cambia nulla',
+    look:['Nella vista 2 il titolo non sta sopra una foto: sta su colore/sfondo, a 15,42:1.','Qualunque foto metta Marta, il titolo si legge uguale.'],
+    say:'Spostare il testo fuori dalla foto è la correzione più semplice: il contrasto si misura una volta e vale sempre.',
+    ask:'Nel vostro progetto c\'è un testo sopra una foto? Si leggerebbe con un\'altra foto?'}
+};
+
+/* ---------- stato ---------- */
+const S={view:1,c:false,t:false,b:false,f:false,focus:null,toast:null};
+let toastTimer;
+function reset(){S.view=1;S.c=S.t=S.b=S.f=false;S.focus=null;S.toast=null;clearTimeout(toastTimer);render()}
+
+/* ---------- pezzi comuni ---------- */
+function status(){return `<div class="status"><span>9:41</span><span>●●● 82%</span></div>`}
+/* lbl: classi del testo della voce; t: numero del tipo di testo */
+function tabbar(lbl,t){
+  const tabs=[['leaf','Piante'],['bell','Promemoria'],['book','Impara'],['user','Profilo']];
+  return `<nav class="tabbar" aria-label="Barra in basso">${tabs.map(([ic,l],i)=>`<button class="tab" ${i===0?'aria-current="page"':''} data-a="nav"><span class="ic" aria-hidden="true">${I[ic]}</span><span class="${lbl}" data-t="${t}">${l}</span></button>`).join('')}</nav>`;
+}
+
+/* ---------- vista 1: «Le mie piante» con errori (V1) ----------
+   data-c: l'interruttore C misura questo elemento (text, graphic o photo).
+   data-t: il numero del tipo di testo per l'interruttore T. */
+function viewV1(){
+  return status()+`
+  <div class="v1-hero">${foto(S.f)}<h1 data-c="photo"><span data-t="1">Le mie piante</span></h1></div>
+  <div class="body">
+    <p class="v1-greet" data-c="text"><span data-t="2">Ciao Marta, ecco le tue piante.</span></p>
+    <p class="v1-label"><span data-t="3">Le tue piante</span></p>
+    ${PLANTS.map(([n,note,due],k)=>`<button class="prow" data-a="nav" aria-label="${n}">
+      <span class="thumb">${mini(k)}</span>
+      <span class="txt"><span class="nameline"><span class="v1-name" data-t="4" ${due?'data-c="text"':''}>${n}</span><span class="dot ${due?'thirsty':'fine'}" ${due?'data-c="graphic"':''}></span></span><span class="v1-note" data-t="5" ${due?'data-c="text"':''}>${note}</span></span>
+    </button>`).join('')}
+    <button class="primary" data-a="nav" data-c="text"><span data-t="6">Aggiungi una pianta</span></button>
+  </div>`+tabbar('lbl','5');
+}
+
+/* ---------- vista 2: la stessa schermata con i token (V2) ---------- */
+function viewV2(){
+  const T=k=>STYLES[k-1].name.split('/')[1];
+  const tt=k=>`${k} · ${T(k)}`;
+  return status()+`
+  <div class="top"><h1 class="testo-titolo c-testo" data-c="text"><span data-t="${tt(1)}">Le mie piante</span></h1></div>
+  <div class="body">
+    <p class="v2-greet testo-corpo c-testo" data-c="text"><span data-t="${tt(3)}">Ciao Marta, oggi una pianta ha sete.</span></p>
+    ${PLANTS.map(([n,note,due],k)=>`<button class="prow" data-a="nav">
+      <span class="thumb">${mini(k)}</span>
+      <span class="txt">
+        <span class="testo-sottotitolo c-testo" data-t="${tt(2)}" ${due?'data-c="text"':''}>${n}</span>
+        ${due?`<span class="thirst testo-corpo c-acqua" data-c="text">${I.drop}<span data-t="${tt(3)}">Ha sete oggi</span></span>`:''}
+        <span class="testo-nota c-secondario" data-t="${tt(4)}" ${due?'data-c="text"':''}>${note}</span>
+      </span>
+    </button>`).join('')}
+    <button class="primary testo-corpo" data-a="nav" data-c="text"><span data-t="${tt(3)}">Aggiungi una pianta</span></button>
+  </div>`+tabbar('testo-nota c-secondario',tt(4));
+}
+
+/* ---------- vista 3: il foglio dei token ---------- */
+function sheet(){
+  const pal=TOKENS.map(t=>{
+    const cr=t.pairs.length?t.pairs.map(([other,label,isBg])=>{
+      const r=ratio(hexRgb(t.v),hexRgb(other));
+      const th=4.5; const ok=r>=th;
+      return `<span class="cb ${ok?'ok':'ko'}" data-ratio="${fmt(r)}">${fmt(r)}:1 ${label} · ${ok?'passa':'non passa'} 4,5</span>`;
+    }).join(''):'<span class="none">— è uno sfondo: si misura con il testo che porta</span>';
+    return `<div class="tok" data-token="${t.name}"><span class="sw" style="background:${t.v}"></span><div><code>${t.name}</code><span class="val">${t.v}</span><p class="use">${t.use}</p><div class="cr">${cr}</div></div></div>`;
+  }).join('');
+  const sty=STYLES.map(s=>`<div class="sty"><span class="sample ${s.cls}">${s.sample}</span><code>${s.name}</code><span class="meta">${s.meta}</span></div>`).join('');
+  return `<div class="sheet">
+    <p class="kicker">Pagina «Token» del file «Lezione 9 - 12»</p>
+    <h2>I token di Vaso</h2>
+    <h3>Palette · variabili di colore</h3>${pal}
+    <h3>Scala tipografica · stili di testo</h3>${sty}
+    <p class="foot">Un solo font. Contrasti calcolati con la formula WCAG; soglia 4,5 per il testo normale, 3 per il testo grande e gli elementi grafici.</p>
+  </div>`;
+}
+
+/* ---------- interruttore C: misura e scrive i contrasti ---------- */
+function applyContrast(root){
+  root.querySelectorAll('[data-c]').forEach(el=>{
+    const kind=el.dataset.c;
+    if(kind==='photo'){el.insertAdjacentHTML('beforeend','<span class="cb ko">non si può garantire: cambia con la foto</span>');return}
+    const cs=getComputedStyle(el);
+    let fg,bg;
+    if(kind==='graphic'){fg=cssRgb(cs.backgroundColor).rgb;bg=bgOf(el.parentElement)}
+    else{fg=cssRgb(cs.color).rgb;bg=bgOf(el)}
+    const r=ratio(fg,bg),t=threshold(kind,parseFloat(cs.fontSize),parseInt(cs.fontWeight,10));
+    if(kind==='graphic')el.insertAdjacentHTML('afterend',badge(r,t));
+    else el.insertAdjacentHTML('beforeend',badge(r,t));
+  });
+}
+
+/* ---------- disegno ---------- */
+function render(){
+  const ph=document.getElementById('phones');
+  ph.classList.toggle('tall',S.view===3);
+  if(S.view===3){ph.innerHTML=sheet()}
+  else{
+    let h=S.view===1?viewV1():viewV2();
+    if(S.toast)h+=`<div class="toast" role="status">${S.toast}</div>`;
+    ph.innerHTML=`<div class="device"><div class="phone"><div class="screen st-v${S.view}${S.t?' count':''}${S.b?' bw':''}" data-screen>${h}</div></div></div>`;
+    if(S.c)applyContrast(ph.querySelector('[data-screen]'));
+  }
+  renderPanel();
+}
+
+function renderPanel(){
+  document.getElementById('views').innerHTML=Object.entries(VIEWS).map(([k,x])=>`<button aria-pressed="${S.view==k}" data-view="${k}"><kbd>${k}</kbd>${x}</button>`).join('');
+  const off=S.view===3;
+  document.getElementById('switches').innerHTML=Object.entries(SWITCHES).map(([k,x])=>`<button class="switch" role="switch" aria-checked="${S[k]}" data-sw="${k}" ${off?'disabled':''}><span class="knob" aria-hidden="true"></span><span><kbd>${k.toUpperCase()}</kbd>${x}</span></button>`).join('');
+  document.getElementById('swHint').hidden=!off;
+  const key=(!off&&S.focus&&S[S.focus])?S.focus+S.view:'v'+S.view;
+  const n=NOTES[key];
+  document.getElementById('card').innerHTML=`<span class="tag">${n.tag}</span><h3>${n.title}</h3>
+    <h4>Cosa guardare</h4><ul>${n.look.map(x=>`<li>${x}</li>`).join('')}</ul>
+    <h4>Cosa dire</h4><p>${n.say}</p>
+    <h4>Domanda per la classe</h4><p class="ask">${n.ask}</p>`;
+}
+
+/* ---------- azioni ---------- */
+function setView(v){S.view=v;S.toast=null;render()}
+function toggle(k){
+  if(S.view===3)return;
+  S[k]=!S[k];
+  if(S[k])S.focus=k;
+  else if(S.focus===k)S.focus=['c','t','b','f'].filter(x=>S[x]).pop()||null;
+  render();
+}
+function toast(msg){S.toast=msg;clearTimeout(toastTimer);toastTimer=setTimeout(()=>{S.toast=null;render()},2200)}
+document.getElementById('phones').addEventListener('click',e=>{
+  const el=e.target.closest('[data-a]');if(!el)return;
+  ripple(e);toast('Qui guardiamo solo questa schermata');render();
+});
+document.querySelector('.panel').addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b||b.disabled)return;
+  if(b.dataset.view)setView(Number(b.dataset.view));
+  else if(b.dataset.sw)toggle(b.dataset.sw);
+  else if(b.id==='reset')reset();
+});
+document.addEventListener('keydown',e=>{
+  if(e.ctrlKey||e.metaKey||e.altKey)return;
+  const k=e.key.toLowerCase();
+  if(k==='1'||k==='2'||k==='3')setView(Number(k));
+  else if(k in SWITCHES)toggle(k);
+  else if(k==='r')reset();
+});
+function ripple(e){
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches||!e.clientX)return;
+  const d=document.createElement('div');d.className='ripple';d.style.left=e.clientX+'px';d.style.top=e.clientY+'px';
+  document.body.appendChild(d);setTimeout(()=>d.remove(),500);
+}
+reset();
+</script>
+</body>
+</html>
