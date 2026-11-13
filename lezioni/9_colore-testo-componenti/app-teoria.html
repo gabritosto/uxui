@@ -3,12 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Vaso — Colore e testo (Lezione 9)</title>
+<title>Vaso — Colore, testo e componenti (Lezioni 9–10)</title>
 <!--
   =====================================================================
-  VASO — prototipo per mostrare la teoria della Lezione 9
+  VASO — prototipo per mostrare la teoria delle Lezioni 9 e 10
   Corso UX/UI Design. Non è un'app confusa: serve a confrontare la
-  stessa schermata scelta «a occhio» e poi misurata con i token.
+  stessa schermata scelta «a occhio» e poi misurata con i token
+  (Lezione 9), e gli stessi pezzi copiati a mano e poi fatti con i
+  componenti (Lezione 10).
   Nato da una copia del prototipo della Lezione 7 (stesso telefono,
   stesso pannello, stessa app). Quel file non è stato toccato.
   =====================================================================
@@ -30,7 +32,34 @@
     T  Conta i tipi di testo
     B  Bianco e nero        filtro in scala di grigi sul telefono
     F  Foto chiara          solo la vista 1 ha un testo sopra la foto
-    R  Ricomincia
+
+  Viste di Lezione 10 (V3 e V4 di lezioni/10_componenti/case-study.md).
+  Due schermate affiancate: «Le mie piante» e «Scheda della pianta –
+  Basilico» (la scheda segue la vista Mockup del prototipo di Lezione 7,
+  con i token di Lezione 9):
+    4. Elementi staccati  V3: tutto disegnato o copiato a mano. Differenze
+                          messe apposta: la terza card ha angoli 20 invece
+                          di 16; «Aggiungi una pianta» è alta 48 e «Segna
+                          annaffiatura» 52; nella barra della scheda c'è
+                          ancora «Shop».
+    5. Con i componenti   V4: le stesse schermate fatte solo di istanze
+                          (card 16, bottoni uguali, la stessa barra con
+                          «Piante» attiva; nella scheda il primario «Segna
+                          annaffiatura» e il secondario «Aggiungi una foto»).
+    6. I componenti       la pagina «Componenti»: Bottone, Campo di testo,
+                          Card della pianta, Barra di navigazione con le
+                          varianti, e i token di spazio e raggio.
+
+  Interruttori (valgono sulle viste 4 e 5; C T B F valgono solo sulle 1 e 2):
+    K  Cambia il principale  raggio/card da 16 a 0, angoli del Bottone da
+                             8 a 24. Vista 5: cambia tutto. Vista 4: cambia
+                             solo il primo elemento di ogni tipo (la card
+                             del Basilico e «Aggiungi una pianta»).
+    I  Mostra istanze        etichetta su card, bottoni e barre: rombo +
+                             «Istanza · ...» con contorno continuo, oppure
+                             «Elemento staccato» con contorno tratteggiato.
+    R  Ricomincia (vista 1, tutto spento)
+  Tasti: da 1 a 6 le viste; C T B F; K I; R.
   Un solo file, nessuna risorsa esterna: funziona offline.
   =====================================================================
 -->
@@ -157,6 +186,95 @@ h1 .cb{font-size:11px}
 .sty .meta{font-size:13px;color:var(--muted);margin-left:6px}
 .sheet .foot{font-size:14px;color:var(--muted);margin:14px 0 0}
 
+/* ===== LEZIONE 10: viste 4 e 5, due schermate affiancate =====
+   I token di spazio e raggio (--spazio-..., --raggio-...) sono scritti dal
+   JavaScript, dall'elenco DIMS. --bottone-raggio sono gli angoli del
+   componente Bottone (8, come raggio/controllo); il tasto K lo porta a 24. */
+:root{--bottone-raggio:var(--raggio-controllo)}
+.phone.duo{width:340px;height:720px}
+@media (max-width:900px){.phones.duo{flex-direction:column;align-items:center;gap:24px}.phone.duo{width:min(380px,100%)}}
+.cap{margin:0;font-weight:700;font-size:15px}
+.st-c{background:var(--colore-sfondo);color:var(--colore-testo);font-family:var(--font)}
+.st-c .status{color:var(--colore-testo)}
+.icon-btn{width:44px;height:44px;border:0;background:transparent;border-radius:12px;display:grid;place-items:center;flex:none;color:var(--colore-testo);margin-left:-10px}
+.icon-btn svg{width:24px;height:24px}
+.hero-img{height:112px;border-radius:16px;overflow:hidden;margin-bottom:12px}
+.hero-img svg{width:100%;height:100%;display:block}
+.latin{margin:2px 0 12px}
+.last{margin:0}
+.diary-h{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+.diary-h h2{margin:0}
+.photos{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.photos>div{aspect-ratio:1;overflow:hidden;border-radius:12px}
+.photos svg{width:100%;height:100%;display:block}
+.thumb{width:52px;height:52px;flex:none;overflow:hidden;border-radius:14px}
+.thumb svg{width:100%;height:100%;display:block}
+.pc{position:relative;width:100%;display:flex;align-items:center;text-align:left;border:0;color:inherit;background:var(--colore-superficie);box-shadow:0 6px 14px -10px rgba(22,32,42,.45)}
+.pc .txt{flex:1;min-width:0;display:flex;flex-direction:column;align-items:flex-start}
+.bt{position:relative;width:100%;display:flex;align-items:center;justify-content:center;text-align:center;border:0;background:var(--colore-primario);color:var(--colore-superficie)}
+.c-bar,.d-bar{position:relative;background:var(--colore-superficie);border-top:1px solid #DDE4DE}
+.c-bar .tab .ic,.d-bar .tab .ic{color:var(--colore-testo-secondario)}
+.c-bar .tab .lb{color:var(--colore-testo-secondario)}
+.d-bar .tab[aria-current] .ic{color:var(--colore-primario);background:#E3EFE6}
+.c-bar .tab[aria-current] .ic,.c-bar .tab[aria-current] .lb{color:var(--colore-primario)}
+.tabbar.five{grid-template-columns:repeat(5,1fr)}
+.tabbar.five .tab .ic{width:44px}
+
+/* 4. ELEMENTI STACCATI (V3): disegnati a mano, misure scritte una per una */
+.st-v4 .top{padding:2px 18px 8px}
+.st-v4 .pc{gap:12px;padding:10px 12px;margin-bottom:10px}      /* angoli scritti a mano, card per card */
+.st-v4 .bt{margin:6px 0 0}                                     /* altezza e angoli scritti a mano */
+
+/* 5. CON I COMPONENTI (V4): solo istanze, solo token */
+.st-v5 .top{padding:2px var(--spazio-m) 8px}
+.st-v5 .body{padding:0 var(--spazio-m) var(--spazio-m)}
+.c-card{gap:var(--spazio-m);padding:var(--spazio-m);margin-bottom:var(--spazio-s);border-radius:var(--raggio-card)}
+.c-card .txt{gap:var(--spazio-s)}
+.c-card .thirst{margin:0}
+.c-btn{height:48px;padding:0 var(--spazio-m);border:2px solid var(--colore-primario);border-radius:var(--bottone-raggio)}
+.c-btn.sec{background:var(--colore-superficie);color:var(--colore-primario)}
+.c-btn[disabled]{opacity:.4;cursor:default}
+.gap-l{margin-top:var(--spazio-l)}
+.gap-s{margin-top:var(--spazio-s)}
+
+/* ---------- interruttore I: istanza o elemento staccato (mai il solo colore) ---------- */
+.lab{display:none;position:absolute;left:8px;top:-10px;z-index:3;align-items:center;gap:4px;padding:0 7px;border-radius:5px;color:#FFFFFF;font:700 11px/18px var(--plain);letter-spacing:0;white-space:nowrap;pointer-events:none;box-shadow:0 0 0 2px #FFFFFF}
+.lab svg{width:11px;height:11px;flex:none}
+.lab.inst{background:#6D28D9}
+.lab.det{background:#9A3412}
+.show-i .lab{display:inline-flex}
+.show-i .is-inst{outline:2px solid #6D28D9;outline-offset:2px}
+.show-i .is-det{outline:2px dashed #9A3412;outline-offset:2px}
+.show-i .tabbar.is-inst,.show-i .tabbar.is-det{outline-offset:-3px}
+.tabbar .lab{top:-9px;left:12px}
+
+/* ---------- vista 6: la pagina «Componenti» ---------- */
+.sheet.wide{width:580px}
+.comp{border:1px solid #C4B5FD;border-radius:14px;padding:12px 14px 14px;margin-top:12px;background:#FBFAFF}
+.sheet .comp-h{display:flex;align-items:center;gap:8px;margin:0;font-size:18px;color:var(--ink);text-transform:none;letter-spacing:0}
+.comp-h svg{width:18px;height:18px;flex:none;color:#6D28D9}
+.comp .props{font-size:14px;color:var(--muted);margin:2px 0 10px}
+.vars{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.vars.one{grid-template-columns:1fr}
+.var{min-width:0}
+.var-n{display:block;font:700 12px/1.4 var(--mono);color:var(--muted);margin-bottom:6px}
+.comp .pc,.comp .c-card{margin-bottom:0}
+.comp .tabbar{padding-bottom:6px;border:1px solid #DDE4DE;border-radius:12px;font-family:var(--font)}
+.fld{display:flex;flex-direction:column;gap:var(--spazio-s);color:var(--colore-testo);font-family:var(--font)}
+.fld .box{height:48px;display:flex;align-items:center;padding:0 var(--spazio-m);border:2px solid var(--colore-testo-secondario);border-radius:var(--raggio-controllo);background:var(--colore-superficie)}
+.fld.off{opacity:.4}
+.fld.err .box{border-color:var(--colore-errore)}
+.fld .msg{display:flex;align-items:flex-start;gap:6px;color:var(--colore-errore)}
+.fld .msg svg{width:18px;height:18px;flex:none;margin-top:1px}
+.dim{display:grid;grid-template-columns:64px 1fr;gap:12px;align-items:center;padding:10px 0;border-top:1px solid #E5EAEC}
+.dim>div{min-width:0}
+.dim .smp{height:40px;display:flex;align-items:center}
+.dim .bar{height:16px;background:var(--water);border-radius:2px}
+.dim .sq{width:44px;height:44px;border:2px solid var(--leaf);background:var(--leaf-soft)}
+.dim code{font-family:var(--mono);font-size:14px;font-weight:700}
+.dim .val{font-family:var(--mono);font-size:13px;color:var(--muted);margin-left:6px}
+.dim .use{font-size:14px;margin:2px 0 0}
+
 /* tocco: il cerchio che si vede sul proiettore */
 .ripple{position:fixed;width:46px;height:46px;margin:-23px 0 0 -23px;border-radius:50%;border:3px solid var(--water);pointer-events:none;z-index:50;animation:rip .45s ease-out forwards}
 @keyframes rip{from{transform:scale(.4);opacity:1}to{transform:scale(1.3);opacity:0}}
@@ -198,8 +316,8 @@ kbd{font:inherit;font-size:12px;opacity:.6;margin-right:6px}
   <div class="phones" id="phones"></div>
 
   <div class="panel">
-    <h1 class="title">Vaso: la stessa schermata, prima a occhio e poi con i token</h1>
-    <p class="lead">Partite dalla vista 1 e accendete gli interruttori uno alla volta. Poi passate alla vista 2 con gli stessi interruttori accesi, e chiudete con il foglio dei token.</p>
+    <h1 class="title" id="title"></h1>
+    <p class="lead" id="lead"></p>
 
     <section>
       <h2>Lezione 9 · Colore e testo</h2>
@@ -212,12 +330,23 @@ kbd{font:inherit;font-size:12px;opacity:.6;margin-right:6px}
       <p class="hint" id="swHint" hidden>Gli interruttori valgono sulle viste 1 e 2. Qui i contrasti sono già scritti accanto a ogni colore.</p>
     </section>
 
+    <section>
+      <h2>Lezione 10 · Componenti</h2>
+      <div class="seg" id="views10"></div>
+    </section>
+
+    <section>
+      <h2>Interruttori (viste 4 e 5)</h2>
+      <div class="switches" id="switches10"></div>
+      <p class="hint" id="swHint10" hidden>K e I valgono sulle viste 4 e 5. Qui ci sono i componenti principali: si cambiano solo qui, e le istanze li seguono.</p>
+    </section>
+
     <section aria-live="polite">
       <div class="card" id="card"></div>
     </section>
 
     <button class="reset" id="reset">Ricomincia (vista 1, interruttori spenti)</button>
-    <p class="hint">Tasti: 1, 2 e 3 cambiano vista; C contrasti, T tipi di testo, B bianco e nero, F foto chiara; R ricomincia.</p>
+    <p class="hint">Tasti: da 1 a 6 cambiano vista; C contrasti, T tipi di testo, B bianco e nero, F foto chiara (viste 1 e 2); K cambia il principale, I mostra istanze (viste 4 e 5); R ricomincia.</p>
   </div>
 </main>
 
@@ -240,6 +369,15 @@ const STYLES=[
   {name:'testo/nota',cls:'testo-nota',meta:'13 px · normale',sample:'Annaffiata 3 giorni fa'}
 ];
 TOKENS.forEach(t=>document.documentElement.style.setProperty('--'+t.name.replace('/','-'),t.v));
+/* token di spazio e raggio di Lezione 10 (case-study.md di L10, V4): variabili numeriche */
+const DIMS=[
+  {name:'spazio/s',v:8,kind:'spazio',use:'Tra nome e nota dentro la card; tra icona e testo'},
+  {name:'spazio/m',v:16,kind:'spazio',use:'Spazio interno di bottoni, campi e card; margine ai lati della schermata'},
+  {name:'spazio/l',v:24,kind:'spazio',use:'Tra un blocco e l\'altro della schermata'},
+  {name:'raggio/controllo',v:8,kind:'raggio',use:'Angoli di bottoni e campi'},
+  {name:'raggio/card',v:16,kind:'raggio',use:'Angoli delle card'}
+];
+DIMS.forEach(t=>document.documentElement.style.setProperty('--'+t.name.replace('/','-'),t.v+'px'));
 
 /* ---------- contrasto: formula WCAG 2 (luminanza relativa) ---------- */
 function hexRgb(h){h=h.replace('#','');return [0,2,4].map(i=>parseInt(h.slice(i,i+2),16))}
@@ -266,7 +404,21 @@ const I={
   bell:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 21h4"/></svg>',
   book:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 21V5"/></svg>',
   user:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/></svg>',
-  drop:'<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" aria-hidden="true"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/></svg>'
+  drop:'<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" aria-hidden="true"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/></svg>',
+  /* Lezione 10 */
+  back:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>',
+  bag:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l-1 13H6z"/><path d="M9 10V6a3 3 0 0 1 6 0v4"/></svg>',
+  alert:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v6"/><path d="M12 16.5v.5"/></svg>',
+  /* il rombo dell'istanza e i quattro rombi del componente principale, come in Figma */
+  inst:'<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M6 1l5 5-5 5-5-5z"/></svg>',
+  main:'<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l4 4-4 4-4-4zM6 8l4 4-4 4-4-4zM18 8l4 4-4 4-4-4zM12 14l4 4-4 4-4-4z"/></svg>'
+};
+/* icone piene della voce attiva nella Barra di navigazione (mai il solo colore) */
+const IF={
+  leaf:'<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19c0-8 5-13 14-14 0 9-5 14-13 14z"/><path d="M5 19l7-7" stroke="#FFFFFF"/></svg>',
+  bell:'<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 21h4" fill="none"/></svg>',
+  book:'<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 21V5" fill="none"/></svg>',
+  user:'<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6z"/></svg>'
 };
 
 /* ---------- illustrazioni (SVG disegnati qui, nessuna foto vera) ---------- */
@@ -292,10 +444,29 @@ function mini(k){
   return `<svg viewBox="0 0 44 44" aria-hidden="true"><rect width="44" height="44" fill="${pal[1]}"/>${shape}<path d="M14 28h16l-2 12H16z" fill="${pal[2]}"/></svg>`;
 }
 
+/* foto del basilico per la scheda: la stessa della vista Mockup di Lezione 7 */
+const LEAVES=[[150,70,-30,1],[118,88,-60,.9],[184,86,40,.95],[136,52,-10,.8],[168,50,20,.85],[104,110,-75,.75],[198,108,70,.8],[150,40,0,.7],[126,112,-40,.7],[176,112,35,.7]];
+function basil(){
+  return `<svg viewBox="0 0 300 180" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Foto del basilico"><rect width="300" height="180" fill="#E3EFE6"/><circle cx="252" cy="36" r="22" fill="#F7E3A6"/><path d="M0 150h300v30H0z" fill="#D6E6D9"/><path d="M150 140V78M150 110l-24-18M150 100l26-16M150 90l-12-30M150 88l14-32" stroke="#3E7D4F" stroke-width="4" fill="none" stroke-linecap="round"/>${LEAVES.map(([x,y,r,s],i)=>`<ellipse cx="${x}" cy="${y}" rx="${18*s}" ry="${11*s}" transform="rotate(${r} ${x} ${y})" fill="${['#4C9A5E','#5DAE6C','#3F8A52'][i%3]}"/>`).join('')}<path d="M112 132h76l-9 44h-58z" fill="#C8693F"/><rect x="106" y="126" width="88" height="14" rx="4" fill="#B65A33"/></svg>`;
+}
+
 /* ---------- contenuti ---------- */
 const PLANTS=[['Basilico','Annaffiata 3 giorni fa',true],['Monstera','Annaffiata ieri'],['Ficus','Annaffiata 2 giorni fa'],['Rosmarino','Annaffiata oggi']];
 const VIEWS={1:'Con errori',2:'Con i token',3:'I token'};
 const SWITCHES={c:'Mostra i contrasti',t:'Conta i tipi di testo',b:'Bianco e nero',f:'Foto chiara'};
+/* Lezione 10 */
+const VIEWS10={4:'Elementi staccati',5:'Con i componenti',6:'I componenti'};
+const SWITCHES10={k:'Cambia il principale',i:'Mostra istanze'};
+const ALLSW={...SWITCHES,...SWITCHES10};
+/* su quali viste vale un interruttore */
+const swOn=(k,v)=>k in SWITCHES?(v===1||v===2):(v===4||v===5);
+/* le tre card di Lezione 10 (V3: «Le 3 card delle piante») */
+const PLANTS10=PLANTS.slice(0,3);
+const TABS=[['leaf','Piante'],['bell','Promemoria'],['book','Impara'],['user','Profilo']];
+const HEAD={
+  9:['Vaso: la stessa schermata, prima a occhio e poi con i token','Partite dalla vista 1 e accendete gli interruttori uno alla volta. Poi passate alla vista 2 con gli stessi interruttori accesi, e chiudete con il foglio dei token.'],
+  10:['Vaso: gli stessi pezzi, prima copiati a mano e poi collegati','Partite dalla vista 4: chiedete alla classe le tre differenze, poi accendete K e I. Passate alla vista 5 con gli stessi interruttori accesi, e chiudete con la pagina dei componenti.']
+};
 
 /* testi del pannello: cosa guardare, cosa dire, domanda */
 const NOTES={
@@ -342,13 +513,42 @@ const NOTES={
   f2:{tag:'Lezione 9 · vista 2 · F',title:'Foto chiara: qui non cambia nulla',
     look:['Nella vista 2 il titolo non sta sopra una foto: sta su colore/sfondo, a 15,42:1.','Qualunque foto metta Marta, il titolo si legge uguale.'],
     say:'Spostare il testo fuori dalla foto è la correzione più semplice: il contrasto si misura una volta e vale sempre.',
-    ask:'Nel vostro progetto c\'è un testo sopra una foto? Si leggerebbe con un\'altra foto?'}
+    ask:'Nel vostro progetto c\'è un testo sopra una foto? Si leggerebbe con un\'altra foto?'},
+  /* ---------- Lezione 10 ---------- */
+  v4:{tag:'Lezione 10 · vista 4',title:'Elementi staccati: sembra tutto in ordine',
+    look:['Due schermate di Vaso con i token di Lezione 9. Ogni pezzo è disegnato o copiato a mano.','Le tre card delle piante: la terza, il Ficus, ha gli angoli un po\' più tondi (20 invece di 16).','«Aggiungi una pianta» è alto 48, «Segna annaffiatura» è alto 52.','Nella barra della scheda c\'è ancora la voce «Shop», tolta a Lezione 7.'],
+    say:'Sembra tutto in ordine, ma nessun pezzo è collegato a un altro: sono elementi staccati. Ci sono tre differenze messe apposta. Lasciate che la classe le cerchi, poi accendete K.',
+    ask:'Quale differenza avete visto senza che ve la indicassi? E se le schermate fossero venti?'},
+  k4:{tag:'Lezione 10 · vista 4 · K',title:'Cambia il principale: cambia un pezzo solo',
+    look:['È cambiata una card sola, il Basilico: angoli da 16 a 0. Le altre due erano copie staccate e restano com\'erano (16 e 20).','È cambiato un bottone solo, «Aggiungi una pianta»: angoli da 8 a 24. «Segna annaffiatura», nella scheda, resta a 8.','La barra non cambia: anche lei è copiata, e nella scheda tiene ancora «Shop».'],
+    say:'Ho cambiato il pezzo da cui si era copiato. Le copie non lo seguono: ogni modifica va rifatta a mano, pezzo per pezzo, schermata per schermata. Prima o poi uno resta vecchio.',
+    ask:'Quanti pezzi dovreste ritoccare a mano, qui? E con venti schermate?'},
+  i4:{tag:'Lezione 10 · vista 4 · I',title:'Mostra istanze: qui non ce n\'è nessuna',
+    look:['Ogni card, bottone e barra ha l\'etichetta «Elemento staccato» e un contorno tratteggiato.','Nessuna etichetta con il rombo: in queste due schermate non c\'è nessuna istanza.','In Figma un\'istanza ha il simbolo del rombo nell\'elenco dei livelli (Layers). Un elemento staccato no.'],
+    say:'Un elemento staccato è un pezzo disegnato a mano, oppure un\'istanza scollegata con «Detach instance». Non segue più nessuno: se cambia l\'originale, lui resta com\'è.',
+    ask:'Come fate a capire, in Figma, se un bottone è un\'istanza o un rettangolo con un testo sopra?'},
+  v5:{tag:'Lezione 10 · vista 5',title:'Con i componenti: le stesse schermate, fatte di istanze',
+    look:['Le tre card sono istanze di Card della pianta, tutte con angoli 16. Il Basilico usa lo stato «ha sete»: goccia e «Ha sete oggi».','I bottoni sono istanze di Bottone, tutti alti uguali. Primario: «Aggiungi una pianta» e «Segna annaffiatura». Secondario: «Aggiungi una foto», con fondo bianco, bordo e testo verdi.','La barra è la stessa nelle due schermate. «Piante» è attiva: icona piena e testo in colore/primario. «Shop» non c\'è più.'],
+    say:'Il componente principale sta nella pagina «Componenti» e si modifica solo lì. Nelle schermate ci sono solo istanze, cioè copie collegate al principale. Da un\'istanza si scelgono le proprietà: Tipo, Stato, Etichetta.',
+    ask:'«Segna annaffiatura» e «Aggiungi una foto» sono due bottoni diversi, o lo stesso bottone in due versioni?'},
+  k5:{tag:'Lezione 10 · vista 5 · K',title:'Cambia il principale: cambia tutto, insieme',
+    look:['raggio/card da 16 a 0: cambiano tutte e tre le card.','Angoli del Bottone da 8 a 24: cambiano tutti e tre i bottoni, in tutte e due le schermate.','Nessun pezzo resta indietro. La foto del basilico non cambia: non è una card, è un\'immagine.'],
+    say:'Si cambia il principale una volta, e tutte le istanze lo seguono. È la prova della tappa 3: se una schermata non cambia, lì c\'è un elemento staccato o una modifica locale. Poi si rimette com\'era: spegnete K.',
+    ask:'Guardate la scheda del Basilico: cosa è successo? E nella vista 4, cosa era successo?'},
+  i5:{tag:'Lezione 10 · vista 5 · I',title:'Mostra istanze: ogni pezzo è collegato',
+    look:['Ogni pezzo ha il rombo e il nome del suo componente: «Istanza · Card della pianta», «Istanza · Bottone», «Istanza · Barra di navigazione».','Il contorno è continuo, viola come in Figma. Nella vista 4 era tratteggiato e diceva «Elemento staccato».','La foto, il titolo e i testi della scheda non hanno etichetta: non sono componenti.'],
+    say:'Un\'istanza si cambia dal pannello solo nelle sue proprietà. Si possono cambiare anche angoli o colori, ma diventano una modifica locale: quella parte non segue più il principale.',
+    ask:'Selezionate la card del Basilico: cosa vi dice il pannello? Cosa potete cambiare da qui e cosa no?'},
+  v6:{tag:'Lezione 10 · vista 6',title:'I componenti: costruiti una volta sola',
+    look:['Bottone: Tipo per Stato, quattro varianti. Il disattivato è lo stesso bottone al 40%: non si tocca.','Campo di testo: normale, disattivato, errore. L\'errore ha il bordo in colore/errore, un\'icona e una frase: mai il solo colore.','Card della pianta: normale e «ha sete», con goccia e parola in colore/acqua.','Barra di navigazione: una variante per voce attiva. La voce attiva ha l\'icona piena, non solo un altro colore.','Sotto: i token di spazio e raggio. I componenti usano solo questi numeri.'],
+    say:'Una variante è una versione dello stesso componente: primario e secondario. Uno stato è come appare in un momento: normale, disattivato, in errore. Così non si disegnano otto bottoni: se ne costruisce uno con le sue scelte. Il disattivato misura circa 1,87:1: è sotto la soglia, ma le linee guida WCAG non chiedono il contrasto ai controlli disattivati.',
+    ask:'Il campo in errore si capisce anche in bianco e nero? Da cosa?'}
 };
 
 /* ---------- stato ---------- */
-const S={view:1,c:false,t:false,b:false,f:false,focus:null,toast:null};
+const S={view:1,c:false,t:false,b:false,f:false,k:false,i:false,focus:null,toast:null,toastAt:''};
 let toastTimer;
-function reset(){S.view=1;S.c=S.t=S.b=S.f=false;S.focus=null;S.toast=null;clearTimeout(toastTimer);render()}
+function reset(){S.view=1;S.c=S.t=S.b=S.f=S.k=S.i=false;S.focus=null;S.toast=null;S.toastAt='';clearTimeout(toastTimer);render()}
 
 /* ---------- pezzi comuni ---------- */
 function status(){return `<div class="status"><span>9:41</span><span>●●● 82%</span></div>`}
@@ -415,6 +615,111 @@ function sheet(){
   </div>`;
 }
 
+/* ==================== LEZIONE 10 ====================
+   mode 'det' = elemento staccato (vista 4), 'inst' = istanza (vista 5),
+   'main' = componente principale (vista 6, nessuna etichetta). */
+function lab(mode,name){
+  if(mode==='inst')return `<span class="lab inst">${I.inst}Istanza · ${name}</span>`;
+  if(mode==='det')return `<span class="lab det">Elemento staccato</span>`;
+  return '';
+}
+const mark=m=>m==='inst'?'is-inst':m==='det'?'is-det':'';
+
+/* Card della pianta. style: angoli scritti a mano (solo vista 4) */
+function card(p,k,mode,style=''){
+  const [n,note,due]=p;
+  const tag=mode==='main'?'div':'button';
+  return `<${tag} class="pc ${mode==='det'?'d-card':'c-card'} ${mark(mode)}" ${tag==='button'?'data-a="nav"':''} ${style?`style="${style}"`:''}>${lab(mode,'Card della pianta')}
+    <span class="thumb">${mini(k)}</span>
+    <span class="txt">
+      <span class="testo-sottotitolo c-testo">${n}</span>
+      ${due?`<span class="thirst testo-corpo c-acqua">${I.drop}<span>Ha sete oggi</span></span>`:''}
+      <span class="testo-nota c-secondario">${note}</span>
+    </span>
+  </${tag}>`;
+}
+/* Bottone. o: {sec, off, style, cls} */
+function btn(label,mode,o={}){
+  const tag=mode==='main'?'div':'button';
+  const cls=mode==='det'?'':'c-btn'+(o.sec?' sec':'');
+  return `<${tag} class="bt testo-corpo ${cls} ${mark(mode)} ${o.cls||''}" ${tag==='button'?'data-a="nav"':''} ${o.off?(tag==='button'?'disabled':'style="opacity:.4"'):''} ${o.style?`style="${o.style}"`:''}>${lab(mode,'Bottone')}<span>${label}</span></${tag}>`;
+}
+/* Barra di navigazione. active: indice della voce attiva; shop: la voce vecchia (vista 4) */
+function bar(mode,active=0,shop=false){
+  const tabs=shop?[...TABS.slice(0,3),['bag','Shop'],TABS[3]]:TABS;
+  const inst=mode!=='det';
+  return `<nav class="tabbar ${inst?'c-bar':'d-bar'} ${shop?'five':''} ${mark(mode)}" aria-label="Barra in basso">${lab(mode,'Barra di navigazione')}${tabs.map(([ic,l],i)=>{
+    const on=i===active;
+    return `<${mode==='main'?'span':'button'} class="tab" ${on?'aria-current="page"':''} ${mode==='main'?'':'data-a="nav"'}><span class="ic" aria-hidden="true">${inst&&on?IF[ic]:I[ic]}</span><span class="lb testo-nota ${inst?'':'c-secondario'}">${l}</span></${mode==='main'?'span':'button'}>`;
+  }).join('')}</nav>`;
+}
+
+/* «Le mie piante» in Lezione 10 */
+function piante10(mode){
+  const det=mode==='det';
+  /* vista 4: la prima card è quella da cui si è copiato (segue K); la terza ha 20 */
+  const rad=['border-radius:var(--raggio-card)','border-radius:16px','border-radius:20px'];
+  return status()+`
+  <div class="top"><h1 class="testo-titolo c-testo">Le mie piante</h1></div>
+  <div class="body">
+    <p class="v2-greet testo-corpo c-testo">Ciao Marta, oggi una pianta ha sete.</p>
+    ${PLANTS10.map((p,k)=>card(p,k,mode,det?rad[k]:'')).join('')}
+    ${det?btn('Aggiungi una pianta','det',{style:'height:48px;border-radius:var(--bottone-raggio)'})
+         :btn('Aggiungi una pianta','inst',{cls:'gap-l'})}
+  </div>`+bar(mode,0,false);
+}
+/* «Scheda della pianta – Basilico»: come la vista Mockup di Lezione 7, con i token di Lezione 9 */
+function scheda10(mode){
+  const det=mode==='det';
+  return status()+`
+  <div class="top"><button class="icon-btn" aria-label="Indietro, a Le mie piante" data-a="nav">${I.back}</button></div>
+  <div class="body">
+    <div class="hero-img">${basil()}</div>
+    <h1 class="testo-titolo c-testo" style="margin:0">Basilico</h1>
+    <p class="latin testo-nota c-secondario">Ocimum basilicum</p>
+    <p class="last testo-corpo c-testo">Ultima annaffiatura: lunedì 12 ottobre</p>
+    <span class="thirst testo-corpo c-acqua">${I.drop}<span>Ha sete oggi</span></span>
+    ${det?btn('Segna annaffiatura','det',{style:'height:52px;border-radius:8px;margin-top:14px'})
+         :btn('Segna annaffiatura','inst',{cls:'gap-l'})+btn('Aggiungi una foto','inst',{sec:true,cls:'gap-s'})}
+    <div class="diary" style="margin-top:${det?'20px':'var(--spazio-l)'}">
+      <div class="diary-h"><h2 class="testo-sottotitolo c-testo">Diario</h2><span class="testo-nota c-secondario">4 foto</span></div>
+      <div class="photos">${[0,0,0].map(k=>`<div>${mini(k)}</div>`).join('')}</div>
+    </div>
+  </div>`+bar(mode,0,det);
+}
+function device10(id,cap,h){
+  const k=S.k?' style="--raggio-card:0px;--bottone-raggio:24px"':'';
+  if(S.toast&&S.toastAt===id)h+=`<div class="toast" role="status">${S.toast}</div>`;
+  return `<div class="device"><p class="cap">${cap}</p><div class="phone duo"><div class="screen st-c st-v${S.view}${S.i?' show-i':''}" data-screen="${id}"${k}>${h}</div></div></div>`;
+}
+
+/* ---------- vista 6: la pagina «Componenti» ---------- */
+function sheetComp(){
+  const v=(name,html)=>`<div class="var"><span class="var-n">${name}</span>${html}</div>`;
+  const comp=(name,props,html,one)=>`<div class="comp"><h3 class="comp-h">${I.main}${name}</h3><p class="props">${props}</p><div class="vars ${one?'one':''}">${html}</div></div>`;
+  const field=(st)=>`<div class="fld ${st==='disattivato'?'off':''} ${st==='errore'?'err':''}">
+      <span class="testo-nota c-testo">Nome della pianta</span>
+      <span class="box testo-corpo ${st==='errore'?'c-secondario':'c-testo'}">${st==='errore'?'':'Basilico'}</span>
+      ${st==='errore'?`<span class="msg testo-nota">${I.alert}<span>Scrivi un nome: ti serve per riconoscerla</span></span>`:''}
+    </div>`;
+  const dims=DIMS.map(d=>`<div class="dim" data-dim="${d.name}"><div class="smp">${d.kind==='spazio'?`<span class="bar" style="width:${d.v*2}px"></span>`:`<span class="sq" style="border-radius:${d.v}px"></span>`}</div><div><code>${d.name}</code><span class="val">${d.v}</span><p class="use">${d.use}</p></div></div>`).join('');
+  return `<div class="sheet wide">
+    <p class="kicker">Pagina «Componenti» del file «Lezione 9 - 12»</p>
+    <h2>I componenti di Vaso</h2>
+    ${comp('Bottone','Tipo: primario, secondario · Stato: normale, disattivato · Etichetta: testo libero. 4 varianti',
+      v('primario · normale',btn('Segna annaffiatura','main'))+v('primario · disattivato',btn('Segna annaffiatura','main',{off:true}))+
+      v('secondario · normale',btn('Aggiungi una foto','main',{sec:true}))+v('secondario · disattivato',btn('Aggiungi una foto','main',{sec:true,off:true})))}
+    ${comp('Campo di testo','Stato: normale, disattivato, errore · Etichetta e Testo: testo libero. 3 varianti',
+      ['normale','disattivato','errore'].map(st=>v(st,field(st))).join(''))}
+    ${comp('Card della pianta','Stato: normale, ha sete · Nome e Nota: testo libero. 2 varianti',
+      v('normale',card(PLANTS[1],1,'main'))+v('ha sete',card(PLANTS[0],0,'main')),true)}
+    ${comp('Barra di navigazione','Voce attiva: Piante, Promemoria, Impara, Profilo. 4 varianti',
+      TABS.map(([,l],i)=>v(l,bar('main',i))).join(''),true)}
+    <h3>Spazio e raggio · variabili numeriche</h3>${dims}
+    <p class="foot">Ogni componente usa solo i token di Lezione 9 (vista 3) e questi cinque numeri. Gli spazi si chiamano col gradino della scala, i raggi col ruolo.</p>
+  </div>`;
+}
+
 /* ---------- interruttore C: misura e scrive i contrasti ---------- */
 function applyContrast(root){
   root.querySelectorAll('[data-c]').forEach(el=>{
@@ -433,8 +738,14 @@ function applyContrast(root){
 /* ---------- disegno ---------- */
 function render(){
   const ph=document.getElementById('phones');
-  ph.classList.toggle('tall',S.view===3);
+  ph.classList.toggle('tall',S.view===3||S.view===6);
+  ph.classList.toggle('duo',S.view===4||S.view===5);
   if(S.view===3){ph.innerHTML=sheet()}
+  else if(S.view===6){ph.innerHTML=sheetComp()}
+  else if(S.view===4||S.view===5){
+    const m=S.view===4?'det':'inst';
+    ph.innerHTML=device10('piante','Le mie piante',piante10(m))+device10('scheda','Scheda della pianta – Basilico',scheda10(m));
+  }
   else{
     let h=S.view===1?viewV1():viewV2();
     if(S.toast)h+=`<div class="toast" role="status">${S.toast}</div>`;
@@ -445,11 +756,21 @@ function render(){
 }
 
 function renderPanel(){
-  document.getElementById('views').innerHTML=Object.entries(VIEWS).map(([k,x])=>`<button aria-pressed="${S.view==k}" data-view="${k}"><kbd>${k}</kbd>${x}</button>`).join('');
-  const off=S.view===3;
-  document.getElementById('switches').innerHTML=Object.entries(SWITCHES).map(([k,x])=>`<button class="switch" role="switch" aria-checked="${S[k]}" data-sw="${k}" ${off?'disabled':''}><span class="knob" aria-hidden="true"></span><span><kbd>${k.toUpperCase()}</kbd>${x}</span></button>`).join('');
-  document.getElementById('swHint').hidden=!off;
-  const key=(!off&&S.focus&&S[S.focus])?S.focus+S.view:'v'+S.view;
+  const les=S.view<=3?9:10;
+  document.getElementById('title').textContent=HEAD[les][0];
+  document.getElementById('lead').textContent=HEAD[les][1];
+  const segs=V=>Object.entries(V).map(([k,x])=>`<button aria-pressed="${S.view==k}" data-view="${k}"><kbd>${k}</kbd>${x}</button>`).join('');
+  document.getElementById('views').innerHTML=segs(VIEWS);
+  document.getElementById('views10').innerHTML=segs(VIEWS10);
+  const sws=SW=>Object.entries(SW).map(([k,x])=>`<button class="switch" role="switch" aria-checked="${S[k]}" data-sw="${k}" ${swOn(k,S.view)?'':'disabled'}><span class="knob" aria-hidden="true"></span><span><kbd>${k.toUpperCase()}</kbd>${x}</span></button>`).join('');
+  document.getElementById('switches').innerHTML=sws(SWITCHES);
+  document.getElementById('switches10').innerHTML=sws(SWITCHES10);
+  document.getElementById('swHint').hidden=S.view!==3;
+  document.getElementById('swHint10').hidden=S.view!==6;
+  /* il testo segue l'ultimo interruttore acceso che vale su questa vista */
+  let f=S.focus;
+  if(!(f&&S[f]&&swOn(f,S.view)))f=Object.keys(ALLSW).filter(x=>S[x]&&swOn(x,S.view)).pop()||null;
+  const key=f?f+S.view:'v'+S.view;
   const n=NOTES[key];
   document.getElementById('card').innerHTML=`<span class="tag">${n.tag}</span><h3>${n.title}</h3>
     <h4>Cosa guardare</h4><ul>${n.look.map(x=>`<li>${x}</li>`).join('')}</ul>
@@ -460,15 +781,16 @@ function renderPanel(){
 /* ---------- azioni ---------- */
 function setView(v){S.view=v;S.toast=null;render()}
 function toggle(k){
-  if(S.view===3)return;
+  if(!swOn(k,S.view))return;
   S[k]=!S[k];
   if(S[k])S.focus=k;
-  else if(S.focus===k)S.focus=['c','t','b','f'].filter(x=>S[x]).pop()||null;
+  else if(S.focus===k)S.focus=Object.keys(ALLSW).filter(x=>S[x]&&swOn(x,S.view)).pop()||null;
   render();
 }
 function toast(msg){S.toast=msg;clearTimeout(toastTimer);toastTimer=setTimeout(()=>{S.toast=null;render()},2200)}
 document.getElementById('phones').addEventListener('click',e=>{
   const el=e.target.closest('[data-a]');if(!el)return;
+  const sc=el.closest('[data-screen]');S.toastAt=sc?sc.dataset.screen:'';
   ripple(e);toast('Qui guardiamo solo questa schermata');render();
 });
 document.querySelector('.panel').addEventListener('click',e=>{
@@ -480,8 +802,8 @@ document.querySelector('.panel').addEventListener('click',e=>{
 document.addEventListener('keydown',e=>{
   if(e.ctrlKey||e.metaKey||e.altKey)return;
   const k=e.key.toLowerCase();
-  if(k==='1'||k==='2'||k==='3')setView(Number(k));
-  else if(k in SWITCHES)toggle(k);
+  if(/^[1-6]$/.test(k))setView(Number(k));
+  else if(k in ALLSW)toggle(k);
   else if(k==='r')reset();
 });
 function ripple(e){
